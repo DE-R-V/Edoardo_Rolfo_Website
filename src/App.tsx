@@ -2,11 +2,11 @@ import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { faGithub, faLinkedin } from '@fortawesome/free-brands-svg-icons'
 import { faEnvelope, faFileLines } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { ArrowDown, ArrowLeft, ArrowRight, ChevronDown, ImagePlus, X } from 'lucide-react'
+import { ArrowDown, ArrowLeft, ArrowRight, ImagePlus, X } from 'lucide-react'
 import './App.css'
 
 const profile = {
-  name: 'Nome Cognome',
+  name: 'Edoardo Rolfo',
   linkedinUrl: 'https://www.linkedin.com/in/tuo-profilo/',
   githubUrl: 'https://github.com/tuo-username',
 }
@@ -51,13 +51,13 @@ const translations = {
     aboutKicker: 'CHI SONO',
     aboutRolePrefix: 'Sono il tuo futuro',
     aboutRoles: ['collega', 'amico', 'software developer'],
-    aboutIntroduction: 'Sono Edoardo, software developer con oltre 3 anni di esperienza professionale e una laurea magistrale in Informatica.',
+    aboutIntroduction: 'Sono Edoardo, software developer con circa 3 anni di esperienza professionale e una laurea magistrale in Informatica.',
     discoverAbout: 'Su di me',
     aboutPageKicker: 'OLTRE LA PANORAMICA',
     aboutPageTitle: 'Mi piace creare cose utili, insieme.',
     aboutPageParagraphs: [
       'Sono socievole, collaborativo e determinato: mi piace condividere ciò che imparo, lavorare insieme e curare i dettagli. Cerco progetti che abbiano un impatto concreto sulle persone; per me contano più il valore di ciò che si costruisce e il gruppo di lavoro del settore o dello stack.',
-      'Fuori dal lavoro mi trovi tra videogiochi, storytelling e worldbuilding, extended reality e raccolta funghi. Parlo italiano, sono a livello C1 in inglese e sto imparando lo svedese (A1/A2).',
+      'Fuori dal lavoro mi trovi tra videogiochi, storytelling e worldbuilding, extended reality e raccolta funghi. Parlo italiano, sono a livello C1 in inglese e sto imparando lo svedese (A1).',
     ],
     aboutImageAlt: 'Spazio per una seconda immagine personale',
     aboutImageCaption: 'Seconda immagine da scegliere',
@@ -66,51 +66,73 @@ const translations = {
     journeyKicker: '01 / FORMAZIONE E LAVORO',
     journeyTitle: 'Il mio percorso',
     journeyTimelineLabel: 'Timeline di formazione e lavoro',
+    journeyCloseDetails: 'Chiudi i dettagli',
     journeyItems: [
       {
         kind: 'LAVORO',
-        date: '20XX — OGGI',
-        title: 'Il tuo ruolo professionale',
-        organization: 'Azienda / organizzazione',
-        description: 'Descrivi le tue responsabilità, il tuo impatto e i risultati.',
+        date: 'Mag 2024 — oggi',
+        title: 'Software Developer',
+        organization: 'Reply SPA, Torino',
+        summary: 'Infrastruttura B2B, app iOS e progetti XR.',
+        description: [
+          'Infrastruttura backend B2B multi-tenant: provisioning con Terraform e deployment Kubernetes tramite Helm.',
+          'Dashboard Grafana tramite Terraform per Loki, Prometheus e Tempo, con log, metriche e tracing distribuito.',
+          'Automazione di test e deployment con GitLab CI.',
+          'Sviluppo e manutenzione di un’app iOS per eventi usata da migliaia di persone, con notifiche in tempo reale, validazione QR e sincronizzazione in background fino a 6.000 record per ciclo.',
+          'Modernizzazione di un’app macOS legacy: elaborazione delle immagini passata da circa 10 a centinaia di asset in pochi secondi.',
+          'Contributo ad applicazioni VR per Meta Quest 3 con esperienze collaborative.',
+          'Sviluppo di esperienze immersive per Apple Vision Pro per testare le capacità del dispositivo: contenuti multimediali, simulazioni e consultazione di dati su modelli 3D e animazioni.',
+        ],
       },
       {
-        kind: 'FORMAZIONE',
-        date: '20XX — 20XX',
-        title: 'Il tuo percorso di studi',
-        organization: 'Università / istituto',
-        description: 'Aggiungi il corso di studi, le competenze o i traguardi principali.',
+        kind: 'LAUREA MAGISTRALE',
+        date: '2021 — 2024',
+        title: 'Laurea magistrale in Informatica',
+        organization: 'Università di Torino',
+        summary: 'Specializzazione in Realtà Virtuale e Computer Vision.',
+        description: 'Specializzazione in Realtà Virtuale e Computer Vision (VR & CV).',
       },
       {
-        kind: 'FORMAZIONE',
-        date: '20XX — 20XX',
-        title: 'Formazione precedente',
-        organization: 'Scuola / istituto',
-        description: 'Puoi aggiungere qui un’altra tappa significativa.',
+        kind: 'LAVORO',
+        date: 'Set 2023 — Mar 2024',
+        title: 'XR Developer, tirocinio',
+        organization: 'TIM S.p.A., Torino',
+        summary: 'Porting XR su Meta Quest Pro e Meta Quest 3.',
+        description: [
+          'Porting completo di un’applicazione da mobile e HoloLens a Meta Quest Pro e Meta Quest 3.',
+          'Adattamento di interfaccia, interazioni e gestione dei contenuti ai nuovi dispositivi e modelli di interazione XR.',
+        ],
+      },
+      {
+        kind: 'LAUREA TRIENNALE',
+        date: '2018 — 2021',
+        title: 'Laurea triennale in Informatica',
+        organization: 'Università di Torino',
+        summary: '',
+        description: 'Laurea triennale in Informatica conseguita all’Università di Torino.',
       },
     ],
     projectsKicker: '02 / SELEZIONE',
     projectsTitle: 'Progetti personali',
-    featuredProjectLabel: 'PROGETTO PERSONALE',
-    featuredProjectTitle: 'Il tuo progetto in evidenza',
-    featuredProjectDescription: 'Racconta il contesto, il tuo contributo e il risultato.',
-    secondProjectLabel: 'ESPERIMENTO',
-    secondProjectTitle: 'Un’idea da esplorare',
-    secondProjectDescription: 'Aggiungi una breve descrizione del progetto.',
-    thirdProjectLabel: 'STUDIO',
-    thirdProjectTitle: 'Un altro progetto',
-    thirdProjectDescription: 'Metti in luce ciò che rende unico questo lavoro.',
+    featuredProjectLabel: 'Vincitore XRCC 2025',
+    featuredProjectTitle: 'InYourEyes',
+    featuredProjectDescription: 'Ho guidato sviluppo e team end-to-end di un’app interattiva per simulare disabilità visive: dalla strategia di prodotto e roadmap al design delle interazioni e al prototipo pronto all’uso.',
+    secondProjectLabel: 'Finalista XRCC 2026',
+    secondProjectTitle: 'ClaimCam',
+    secondProjectDescription: 'App XR per workflow assicurativi con ricostruzione 3D della scena tramite Gaussian Splatting, selezionata per XR Creator Con 2026.',
     skillsKicker: '03 / COMPETENZE',
     skillsTitle: 'Le mie competenze',
     skillsItems: [
-      { title: 'Sviluppo software', description: 'Oltre 3 anni di esperienza professionale.' },
-      { title: 'Lavoro di squadra', description: 'Condivisione delle conoscenze e collaborazione.' },
-      { title: 'Approccio', description: 'Determinazione, attenzione ai dettagli e orientamento all’impatto.' },
-      { title: 'Lingue', description: 'Italiano madrelingua · Inglese C1 · Svedese A1/A2.' },
+      { title: 'Cloud e infrastruttura', description: 'Terraform, Helm, AWS, Kubernetes.' },
+      { title: 'Sviluppo iOS', description: 'Swift, SwiftUI, UIKit.' },
+      { title: 'XR, VR & Computer Vision', description: 'Unity, C#, XR Development.' },
+      { title: 'Delivery', description: 'Agile, DevOps, Git, GitLab CI/CD.' },
+      { title: 'Collaborazione', description: 'Adattabilità, team player, feedback-driven, people-oriented.' },
+      { title: 'Lingue', description: 'Italiano madrelingua, inglese C1, svedese A1.' },
     ],
     contactKicker: '04 / CONTATTI',
     contactTitle: 'Contatti',
-    contactDescription: 'Per opportunità e collaborazioni, scrivimi via email o sui miei profili:',
+    contactDescription: 'Cittadino UE, pronto a trasferirmi in Svezia senza necessità di sponsorship. Per opportunità e collaborazioni, scrivimi:',
     contactEmailLabel: 'Scrivimi via email',
     backToTop: 'Torna all’inizio',
   },
@@ -145,13 +167,13 @@ const translations = {
     aboutKicker: 'ABOUT',
     aboutRolePrefix: 'I could be your future',
     aboutRoles: ['colleague', 'friend', 'software developer'],
-    aboutIntroduction: 'I’m Edoardo, a software developer with 3+ years of professional experience and a master’s degree in Computer Science.',
+    aboutIntroduction: 'I’m Edoardo, a software developer with around 3 years of professional experience and a master’s degree in Computer Science.',
     discoverAbout: 'About me',
     aboutPageKicker: 'BEYOND THE OVERVIEW',
     aboutPageTitle: 'I like building useful things, together.',
     aboutPageParagraphs: [
       'I’m sociable, collaborative, and determined. I enjoy sharing what I learn, working as a team, and taking care of the details. I’m looking for projects with a tangible impact on people; the value of the work and the people I build it with matter more to me than the sector or tech stack.',
-      'Outside work, you’ll find me playing video games, exploring storytelling and worldbuilding, getting into extended reality, or out mushroom foraging. I’m a native Italian speaker, have C1 English, and I’m learning Swedish (A1/A2).',
+      'Outside work, you’ll find me playing video games, exploring storytelling and worldbuilding, getting into extended reality, or out mushroom foraging. I’m a native Italian speaker, have C1 English, and I’m learning Swedish (A1).',
     ],
     aboutImageAlt: 'Space for a second personal image',
     aboutImageCaption: 'Second image to be chosen',
@@ -160,57 +182,87 @@ const translations = {
     journeyKicker: '01 / EDUCATION & WORK',
     journeyTitle: 'My journey',
     journeyTimelineLabel: 'Education and work timeline',
+    journeyCloseDetails: 'Close details',
     journeyItems: [
       {
         kind: 'WORK',
-        date: '20XX — PRESENT',
-        title: 'Your professional role',
-        organization: 'Company / organization',
-        description: 'Describe your responsibilities, impact, and results.',
+        date: 'May 2024 — Present',
+        title: 'Software Developer',
+        organization: 'Reply SPA, Turin',
+        summary: 'B2B infrastructure, iOS apps and XR projects.',
+        description: [
+          'Provisioned multi-tenant B2B backend infrastructure with Terraform and managed Kubernetes deployments with Helm.',
+          'Configured Grafana dashboards with Terraform for Loki, Prometheus and Tempo observability data, covering logs, metrics and distributed tracing.',
+          'Automated testing and deployment workflows with GitLab CI.',
+          'Developed and maintained a production iOS event app used by thousands of attendees and staff, with real-time notifications, QR validation and background synchronization for up to 6,000 records per cycle.',
+          'Modernized a legacy macOS app, increasing image-processing throughput from around 10 assets to hundreds in seconds.',
+          'Contributed to VR applications for Meta Quest 3 featuring collaborative experiences.',
+          'Developed immersive experiences for Apple Vision Pro to test the device’s capabilities, including multimedia content, simulations, and data exploration on 3D models and animations.',
+        ],
       },
       {
-        kind: 'EDUCATION',
-        date: '20XX — 20XX',
-        title: 'Your studies',
-        organization: 'University / institution',
-        description: 'Add your course of study, skills, or key milestones.',
+        kind: 'MASTER’S DEGREE',
+        date: '2021 — 2024',
+        title: 'Master’s degree in Computer Science',
+        organization: 'University of Turin',
+        summary: 'Specialization in Virtual Reality and Computer Vision.',
+        description: 'Specialization in Virtual Reality and Computer Vision (VR & CV).',
       },
       {
-        kind: 'EDUCATION',
-        date: '20XX — 20XX',
-        title: 'Earlier education',
-        organization: 'School / institution',
-        description: 'Add another meaningful milestone here.',
+        kind: 'WORK',
+        date: 'Sep 2023 — Mar 2024',
+        title: 'XR Developer, internship',
+        organization: 'TIM S.p.A., Turin',
+        summary: 'XR port to Meta Quest Pro and Meta Quest 3.',
+        description: [
+          'Ported an application from mobile and HoloLens to Meta Quest Pro and Meta Quest 3.',
+          'Adapted the UI, interactions and content management for the new devices and XR interaction models.',
+        ],
+      },
+      {
+        kind: 'BACHELOR’S DEGREE',
+        date: '2018 — 2021',
+        title: 'Bachelor’s degree in Computer Science',
+        organization: 'University of Turin',
+        summary: 'Computer Science at the University of Turin.',
+        description: 'Bachelor’s degree in Computer Science from the University of Turin.',
       },
     ],
     projectsKicker: '02 / SELECTED WORK',
     projectsTitle: 'Personal Projects',
-    featuredProjectLabel: 'PERSONAL PROJECT',
-    featuredProjectTitle: 'Your featured project',
-    featuredProjectDescription: 'Share the context, your contribution, and the outcome.',
-    secondProjectLabel: 'EXPERIMENT',
-    secondProjectTitle: 'An idea to explore',
-    secondProjectDescription: 'Add a short description of the project.',
-    thirdProjectLabel: 'STUDY',
-    thirdProjectTitle: 'Another project',
-    thirdProjectDescription: 'Highlight what makes this work unique.',
+    featuredProjectLabel: 'XRCC 2025 Award Winner',
+    featuredProjectTitle: 'InYourEyes',
+    featuredProjectDescription: 'Led the team and end-to-end development of an interactive visual impairment simulation app, from product strategy and feature roadmap to interaction design and a ready-to-use prototype.',
+    secondProjectLabel: 'XRCC 2026 Finalist',
+    secondProjectTitle: 'ClaimCam',
+    secondProjectDescription: 'An XR insurance workflow app using Gaussian Splatting for 3D scene reconstruction, selected for showcase at XR Creator Con 2026.',
     skillsKicker: '03 / SKILLS',
     skillsTitle: 'Skills',
     skillsItems: [
-      { title: 'Software development', description: 'More than 3 years of professional experience.' },
-      { title: 'Teamwork', description: 'Sharing knowledge and collaborating with others.' },
-      { title: 'Approach', description: 'Determination, attention to detail, and a focus on impact.' },
-      { title: 'Languages', description: 'Native Italian · English C1 · Swedish A1/A2.' },
+      { title: 'Cloud & infrastructure', description: 'Terraform, Helm, AWS, Kubernetes.' },
+      { title: 'iOS development', description: 'Swift, SwiftUI, UIKit.' },
+      { title: 'XR, VR & Computer Vision', description: 'Unity, C#, XR development.' },
+      { title: 'Delivery', description: 'Agile, DevOps, Git, GitLab CI/CD.' },
+      { title: 'Collaboration', description: 'Adaptability, team player, feedback-driven, people-oriented.' },
+      { title: 'Languages', description: 'Native Italian, English C1, Swedish A1.' },
     ],
     contactKicker: '04 / CONTACT',
     contactTitle: 'Contact',
-    contactDescription: 'For opportunities and collaborations, reach me by email or on my profiles:',
+    contactDescription: 'EU citizen, ready to relocate to Sweden with no visa sponsorship required. For opportunities and collaborations, get in touch:',
     contactEmailLabel: 'Email me',
     backToTop: 'Back to top',
   },
 } as const
 
 type Language = keyof typeof translations
+type JourneyItem = {
+  kind: string
+  date: string
+  title: string
+  organization: string
+  summary: string
+  description: string | readonly string[]
+}
 
 function LanguageSelector({
   language,
@@ -324,7 +376,9 @@ function App() {
   const [resumeRequestOpen, setResumeRequestOpen] = useState(false)
   const [aboutPageOpen, setAboutPageOpen] = useState(false)
   const [aboutRoleIndex, setAboutRoleIndex] = useState(0)
+  const [selectedJourneyItem, setSelectedJourneyItem] = useState<JourneyItem | null>(null)
   const resumeRequestDialog = useRef<HTMLDialogElement>(null)
+  const journeyDialog = useRef<HTMLDialogElement>(null)
   const overviewPageHeading = useRef<HTMLHeadingElement>(null)
   const aboutPageHeading = useRef<HTMLHeadingElement>(null)
   const previousAboutPageOpen = useRef(false)
@@ -375,6 +429,14 @@ function App() {
     if (resumeRequestOpen && !dialog.open) dialog.showModal()
     if (!resumeRequestOpen && dialog.open) dialog.close()
   }, [resumeRequestOpen])
+
+  useEffect(() => {
+    const dialog = journeyDialog.current
+    if (!dialog) return
+
+    if (selectedJourneyItem && !dialog.open) dialog.showModal()
+    if (!selectedJourneyItem && dialog.open) dialog.close()
+  }, [selectedJourneyItem])
 
   useEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
@@ -455,13 +517,6 @@ function App() {
       title: copy.secondProjectTitle,
       description: copy.secondProjectDescription,
     },
-    {
-      number: '03',
-      style: 'study',
-      label: copy.thirdProjectLabel,
-      title: copy.thirdProjectTitle,
-      description: copy.thirdProjectDescription,
-    },
   ]
 
   return (
@@ -515,9 +570,12 @@ function App() {
       <section
         className={`home-section${curtainProgress < 1 ? ' home-section--pinned' : ''}`}
         id="home"
+        aria-hidden={revealVisibility === 0}
+        inert={revealVisibility === 0}
         style={{
           opacity: revealVisibility,
           filter: `blur(${(1 - curtainProgress) * 8}px)`,
+          pointerEvents: revealVisibility === 0 ? 'none' : 'auto',
         }}
       >
         <div className="home-shell">
@@ -630,34 +688,88 @@ function App() {
           </div>
           <div className="journey-rail" role="region" aria-label={copy.journeyTimelineLabel} tabIndex={0}>
             <ol className="journey-list">
-              {copy.journeyItems.map((item) => (
-                <li
-                  className={`journey-entry${item.kind === 'WORK' || item.kind === 'LAVORO' ? ' journey-entry--work' : ''}`}
-                  key={`${item.date}-${item.title}`}
-                >
-                  <span className="journey-marker" aria-hidden="true" />
-                  <details className="journey-disclosure">
-                    <summary className="journey-summary">
+              {copy.journeyItems.map((item) => {
+                const isWork = item.kind === 'WORK' || item.kind === 'LAVORO'
+
+                return (
+                  <li
+                    className={`journey-entry${isWork ? ' journey-entry--work' : ''}`}
+                    key={`${item.date}-${item.title}`}
+                  >
+                    <span className="journey-marker" aria-hidden="true" />
+                    <button
+                      className="journey-card"
+                      type="button"
+                      aria-haspopup="dialog"
+                      aria-controls="journey-dialog"
+                      aria-label={`${item.title}, ${item.date}`}
+                      onClick={() => setSelectedJourneyItem(item)}
+                    >
                       <span className="journey-meta">
                         <time className="journey-date">{item.date}</time>
                         <span className="journey-kind">{item.kind}</span>
                       </span>
-                      <h3>{item.title}</h3>
-                      <span className="journey-expand" aria-hidden="true">
-                        <ChevronDown size={18} strokeWidth={1.8} />
+                      <span className="journey-card-title" role="heading" aria-level={3}>
+                        {item.title}
                       </span>
-                    </summary>
-                    <div className="journey-details">
-                      <p className="journey-organization">{item.organization}</p>
-                      <p className="journey-description">{item.description}</p>
-                    </div>
-                  </details>
-                </li>
-              ))}
+                      {item.organization && (
+                        <span className="journey-organization">{item.organization}</span>
+                      )}
+                      <span className="journey-card-summary">{item.summary}</span>
+                      <span className="journey-card-action" aria-hidden="true">
+                        <ArrowRight size={16} strokeWidth={1.8} />
+                      </span>
+                    </button>
+                  </li>
+                )
+              })}
             </ol>
           </div>
         </div>
       </section>
+
+      <dialog
+        className="journey-dialog"
+        id="journey-dialog"
+        ref={journeyDialog}
+        aria-labelledby="journey-dialog-title"
+        aria-describedby="journey-dialog-description"
+        onCancel={() => setSelectedJourneyItem(null)}
+        onClose={() => setSelectedJourneyItem(null)}
+      >
+        {selectedJourneyItem && (
+          <>
+            <div className="journey-dialog-header">
+              <p className="journey-dialog-kicker">
+                {selectedJourneyItem.kind}, {selectedJourneyItem.date}
+              </p>
+              <button
+                className="journey-dialog-close"
+                type="button"
+                aria-label={copy.journeyCloseDetails}
+                onClick={() => setSelectedJourneyItem(null)}
+              >
+                <X size={20} aria-hidden="true" />
+              </button>
+            </div>
+            <h2 id="journey-dialog-title">{selectedJourneyItem.title}</h2>
+            {selectedJourneyItem.organization && (
+              <p className="journey-dialog-organization">{selectedJourneyItem.organization}</p>
+            )}
+            {typeof selectedJourneyItem.description === 'string' ? (
+              <p id="journey-dialog-description" className="journey-dialog-description">
+                {selectedJourneyItem.description}
+              </p>
+            ) : (
+              <ul id="journey-dialog-description" className="journey-dialog-list">
+                {selectedJourneyItem.description.map((detail) => (
+                  <li key={detail}>{detail}</li>
+                ))}
+              </ul>
+            )}
+          </>
+        )}
+      </dialog>
 
       <dialog
         className="resume-request-dialog"
