@@ -226,13 +226,6 @@ summary:active {
   padding-right: 96px;
 }
 
-.home-identity {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 8px 24px;
-}
-
 .home-wordmark {
   margin: 0;
   font-size: 21px;
@@ -251,35 +244,69 @@ summary:active {
 
 .home-nav {
   display: flex;
-  gap: clamp(18px, 3vw, 40px);
-  padding-top: 3px;
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
 }
 
-.home-nav a {
-  padding-bottom: 8px;
-  border-bottom: 1px solid transparent;
-  color: rgba(247, 247, 244, 0.78);
-  font-size: 14px;
-  text-decoration: none;
-  transition:
-    color 160ms ease,
-    border-color 160ms ease;
-}
-
-.home-nav a:hover,
-.home-nav a:focus-visible {
-  border-color: #efc900;
-  color: #fff;
+.home-nav .home-link {
+  margin-top: 0;
 }
 
 .home-hero {
-  display: grid;
+  display: block;
+  position: relative;
   min-height: calc(100svh - 144px);
+  padding: 44px 0 28px;
+  scroll-margin-top: 24px;
+}
+
+.profile-pages {
+  display: grid;
+  min-height: calc(100svh - 216px);
+}
+
+.profile-page {
+  display: grid;
+  grid-area: 1 / 1;
   grid-template-columns: minmax(240px, 0.88fr) minmax(0, 1.12fr);
   align-items: center;
   gap: clamp(48px, 8vw, 112px);
-  padding: 44px 0 28px;
-  scroll-margin-top: 24px;
+  transition:
+    transform 320ms ease,
+    opacity 240ms ease,
+    visibility 0s linear 320ms;
+  visibility: hidden;
+}
+
+.profile-page--overview {
+  opacity: 1;
+  transform: translateX(0);
+  transition-delay: 0s, 0s, 0s;
+  visibility: visible;
+}
+
+.profile-page--about {
+  opacity: 0;
+  transform: translateX(36px);
+  pointer-events: none;
+}
+
+.profile-pages--about .profile-page--overview {
+  opacity: 0;
+  transform: translateX(-36px);
+  transition-delay: 0s, 0s, 320ms;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.profile-pages--about .profile-page--about {
+  opacity: 1;
+  transform: translateX(0);
+  transition-delay: 0s, 0s, 0s;
+  visibility: visible;
+  pointer-events: auto;
 }
 
 .portrait-placeholder {
@@ -295,6 +322,10 @@ summary:active {
   border: 1px solid rgba(255, 255, 255, 0.28);
   color: #fff;
   background: #7898a3;
+}
+
+.portrait-placeholder--about {
+  background: #ad7868;
 }
 
 .portrait-placeholder::before {
@@ -344,6 +375,57 @@ summary:active {
   font-weight: 600;
   line-height: 1.08;
   text-wrap: balance;
+}
+
+.about-page-copy {
+  max-width: 620px;
+}
+
+.about-page-copy h2 {
+  max-width: 600px;
+  margin: 0 0 22px;
+  font-size: 40px;
+  font-weight: 600;
+  line-height: 1.08;
+  text-wrap: balance;
+}
+
+.home-role-word {
+  display: block;
+  color: #efc900;
+  font-weight: 700;
+  animation: about-role-enter 280ms ease both;
+}
+
+@keyframes about-role-enter {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.about-page-introduction {
+  margin: 0 0 18px;
+  color: #f7f7f4;
+  font-size: 17px;
+  font-weight: 500;
+  line-height: 1.55;
+}
+
+.about-page-description {
+  margin: 0 0 16px;
+  color: rgba(247, 247, 244, 0.78);
+  font-size: 16px;
+  line-height: 1.65;
+}
+
+.overview-return {
+  margin-top: 12px;
 }
 
 .home-description {
@@ -571,9 +653,22 @@ summary:active {
   text-decoration: none;
 }
 
+.home-link {
+  appearance: none;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-family: inherit;
+  cursor: pointer;
+}
+
 .home-link:hover,
 .contact-return:hover {
   color: #fff;
+}
+
+.home-copy .home-link:hover svg {
+  transform: translateX(4px);
 }
 
 .journey-section {
@@ -970,19 +1065,19 @@ summary:active {
   }
 
   .home-header {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 24px;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
     padding-right: 0;
   }
 
-  .home-identity,
   .home-nav {
     width: 100%;
   }
 
   .home-nav {
-    flex-wrap: wrap;
+    margin-top: 14px;
+    padding-right: 0;
   }
 
   .journey-heading {
@@ -1113,26 +1208,49 @@ summary:active {
   }
 
   .home-header {
-    flex-direction: column;
-    gap: 24px;
+    gap: 12px;
   }
 
-  .home-identity {
-    width: 100%;
-    gap: 8px 12px;
+  .home-socials {
+    margin-left: auto;
   }
 
   .home-nav {
-    width: 100%;
-    flex-wrap: wrap;
     gap: 12px 24px;
   }
 
   .home-hero {
     min-height: auto;
-    grid-template-columns: minmax(0, 1fr);
-    gap: 40px;
     padding: 40px 0 8px;
+  }
+
+  .profile-pages {
+    min-height: 0;
+  }
+
+  .profile-page {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 32px;
+  }
+
+  .profile-page--about {
+    transform: translateX(16px);
+  }
+
+  .profile-pages--about .profile-page--overview {
+    transform: translateX(-16px);
+  }
+
+  .about-page-copy h2 {
+    font-size: 32px;
+  }
+
+  .about-page-description {
+    font-size: 15px;
+  }
+
+  .about-page-introduction {
+    font-size: 16px;
   }
 
   .portrait-placeholder {
@@ -1230,6 +1348,14 @@ summary:active {
 @media (prefers-reduced-motion: reduce) {
   .reveal-track {
     height: 100svh;
+  }
+
+  .home-role-word {
+    animation: none;
+  }
+
+  .profile-page {
+    transition: none;
   }
 }
 

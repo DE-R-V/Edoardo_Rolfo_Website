@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { faGithub, faLinkedin } from '@fortawesome/free-brands-svg-icons'
 import { faFileLines } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { ArrowDown, ArrowRight, ChevronDown, ImagePlus, X } from 'lucide-react'
+import { ArrowDown, ArrowLeft, ArrowRight, ChevronDown, ImagePlus, X } from 'lucide-react'
 import './App.css'
 
 const profile = {
@@ -41,7 +41,6 @@ const translations = {
     scrollDesktop: 'Scorri per esplorare il sito',
     scrollMobile: 'Scorri per visitare il sito',
     mainNavigation: 'Navigazione principale',
-    profileNavigation: 'Profilo',
     journeyNavigation: 'Percorso',
     projectsNavigation: 'Progetti',
     contactNavigation: 'Contatti',
@@ -49,9 +48,20 @@ const translations = {
     portraitCaption: 'La tua foto',
     portraitIndex: 'RITRATTO / 01',
     aboutKicker: 'CHI SONO',
-    introduction: 'Una breve presentazione.',
-    aboutDescription: 'Racconta qui il tuo percorso, di cosa ti occupi e cosa ti appassiona.',
+    aboutRolePrefix: 'Sono il tuo futuro',
+    aboutRoles: ['collega', 'amico', 'software developer'],
+    aboutIntroduction: 'Sono Edoardo, software developer con oltre 3 anni di esperienza professionale e una laurea magistrale in Informatica.',
     discoverAbout: 'Scopri chi sono',
+    aboutPageKicker: 'OLTRE LA PANORAMICA',
+    aboutPageTitle: 'Mi piace creare cose utili, insieme.',
+    aboutPageParagraphs: [
+      'Sono socievole, collaborativo e determinato: mi piace condividere ciò che imparo, lavorare insieme e curare i dettagli. Cerco progetti che abbiano un impatto concreto sulle persone; per me contano più il valore di ciò che si costruisce e il gruppo di lavoro del settore o dello stack.',
+      'Fuori dal lavoro mi trovi tra videogiochi, storytelling e worldbuilding, extended reality e raccolta funghi. Parlo italiano, sono a livello C1 in inglese e sto imparando lo svedese (A1/A2).',
+    ],
+    aboutImageAlt: 'Spazio per una seconda immagine personale',
+    aboutImageCaption: 'Seconda immagine da scegliere',
+    aboutImageIndex: 'RITRATTO / 02',
+    overviewAction: 'Torna alla panoramica',
     journeyKicker: '01 / FORMAZIONE E LAVORO',
     journeyTitle: 'Il mio percorso',
     journeyTimelineLabel: 'Timeline di formazione e lavoro',
@@ -115,7 +125,6 @@ const translations = {
     scrollDesktop: 'Scroll to explore the website',
     scrollMobile: 'Scroll to visit the website',
     mainNavigation: 'Main navigation',
-    profileNavigation: 'About',
     journeyNavigation: 'Journey',
     projectsNavigation: 'Projects',
     contactNavigation: 'Contact',
@@ -123,9 +132,20 @@ const translations = {
     portraitCaption: 'Your photo',
     portraitIndex: 'PORTRAIT / 01',
     aboutKicker: 'ABOUT',
-    introduction: 'A brief introduction.',
-    aboutDescription: 'Tell your story, what you do, and what you enjoy.',
+    aboutRolePrefix: 'I could be your future',
+    aboutRoles: ['colleague', 'friend', 'software developer'],
+    aboutIntroduction: 'I’m Edoardo, a software developer with 3+ years of professional experience and a master’s degree in Computer Science.',
     discoverAbout: 'Get to know me',
+    aboutPageKicker: 'BEYOND THE OVERVIEW',
+    aboutPageTitle: 'I like building useful things, together.',
+    aboutPageParagraphs: [
+      'I’m sociable, collaborative, and determined. I enjoy sharing what I learn, working as a team, and taking care of the details. I’m looking for projects with a tangible impact on people; the value of the work and the people I build it with matter more to me than the sector or tech stack.',
+      'Outside work, you’ll find me playing video games, exploring storytelling and worldbuilding, getting into extended reality, or out mushroom foraging. I’m a native Italian speaker, have C1 English, and I’m learning Swedish (A1/A2).',
+    ],
+    aboutImageAlt: 'Space for a second personal image',
+    aboutImageCaption: 'Second image to be chosen',
+    aboutImageIndex: 'PORTRAIT / 02',
+    overviewAction: 'Back to overview',
     journeyKicker: '01 / EDUCATION & WORK',
     journeyTitle: 'My journey',
     journeyTimelineLabel: 'Education and work timeline',
@@ -279,7 +299,12 @@ function App() {
     window.localStorage.getItem('portfolio-language') === 'en' ? 'en' : 'it'
   ))
   const [resumeRequestOpen, setResumeRequestOpen] = useState(false)
+  const [aboutPageOpen, setAboutPageOpen] = useState(false)
+  const [aboutRoleIndex, setAboutRoleIndex] = useState(0)
   const resumeRequestDialog = useRef<HTMLDialogElement>(null)
+  const overviewPageHeading = useRef<HTMLHeadingElement>(null)
+  const aboutPageHeading = useRef<HTMLHeadingElement>(null)
+  const previousAboutPageOpen = useRef(false)
   const copy = translations[language]
 
   useEffect(() => {
@@ -327,6 +352,43 @@ function App() {
     if (resumeRequestOpen && !dialog.open) dialog.showModal()
     if (!resumeRequestOpen && dialog.open) dialog.close()
   }, [resumeRequestOpen])
+
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+
+    const interval = window.setInterval(() => {
+      setAboutRoleIndex((index) => (index + 1) % copy.aboutRoles.length)
+    }, 2400)
+
+    return () => window.clearInterval(interval)
+  }, [copy.aboutRoles.length])
+
+  useEffect(() => {
+    const mobileView = window.matchMedia('(max-width: 700px)').matches
+    const scrollBehavior = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      ? 'auto'
+      : 'smooth'
+
+    if (aboutPageOpen) {
+      aboutPageHeading.current?.focus({ preventScroll: true })
+      if (mobileView) {
+        aboutPageHeading.current?.closest('.home-hero')?.scrollIntoView({
+          block: 'start',
+          behavior: scrollBehavior,
+        })
+      }
+    } else if (previousAboutPageOpen.current) {
+      overviewPageHeading.current?.focus({ preventScroll: true })
+      if (mobileView) {
+        overviewPageHeading.current?.closest('.home-hero')?.scrollIntoView({
+          block: 'start',
+          behavior: scrollBehavior,
+        })
+      }
+    }
+
+    previousAboutPageOpen.current = aboutPageOpen
+  }, [aboutPageOpen])
 
   const handleResumeRequest = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -389,7 +451,7 @@ function App() {
       <section className="reveal-track" aria-label={copy.pageTitle}>
         <div
           className="scene"
-          style={{ pointerEvents: curtainProgress >= 1 ? 'none' : 'auto' }}
+          style={{ pointerEvents: revealVisibility < 1 ? 'auto' : 'none' }}
         >
           <div
             className="reveal-haze reveal-haze--deep"
@@ -437,40 +499,95 @@ function App() {
       >
         <div className="home-shell">
           <header className="home-header">
-            <div className="home-identity">
-              <ProfileName className="home-wordmark" linked />
-              <ProfileSocials
-                className="home-socials"
-                linkClassName="home-social-link"
-                profilesLabel={copy.profilesLabel}
-                resumeLabel={copy.resumeLabel}
-                onResumeClick={() => setResumeRequestOpen(true)}
-                withTooltips
-              />
-            </div>
-            <nav className="home-nav" aria-label={copy.mainNavigation}>
-              <a href="#profilo">{copy.profileNavigation}</a>
-              <a href="#percorso">{copy.journeyNavigation}</a>
-              <a href="#progetti">{copy.projectsNavigation}</a>
-              <a href="#contatti">{copy.contactNavigation}</a>
-            </nav>
+            <ProfileName className="home-wordmark" linked />
+            <ProfileSocials
+              className="home-socials"
+              linkClassName="home-social-link"
+              profilesLabel={copy.profilesLabel}
+              resumeLabel={copy.resumeLabel}
+              onResumeClick={() => setResumeRequestOpen(true)}
+              withTooltips
+            />
           </header>
 
           <section className="home-hero" id="profilo">
-            <div className="portrait-placeholder" role="img" aria-label={copy.portraitAlt}>
-              <ImagePlus size={32} strokeWidth={1.5} aria-hidden="true" />
-              <span className="portrait-caption">{copy.portraitCaption}</span>
-              <span className="portrait-index">{copy.portraitIndex}</span>
-            </div>
+            <div className={`profile-pages${aboutPageOpen ? ' profile-pages--about' : ''}`}>
+              <div
+                className="profile-page profile-page--overview"
+                aria-hidden={aboutPageOpen}
+                inert={aboutPageOpen}
+              >
+                <div className="portrait-placeholder" role="img" aria-label={copy.portraitAlt}>
+                  <ImagePlus size={32} strokeWidth={1.5} aria-hidden="true" />
+                  <span className="portrait-caption">{copy.portraitCaption}</span>
+                  <span className="portrait-index">{copy.portraitIndex}</span>
+                </div>
 
-            <div className="home-copy">
-              <p className="home-kicker">{copy.aboutKicker}</p>
-              <h2>{copy.introduction}</h2>
-              <p className="home-description">{copy.aboutDescription}</p>
-              <a className="home-link" href="#percorso">
-                <span>{copy.discoverAbout}</span>
-                <ArrowRight size={18} strokeWidth={1.8} aria-hidden="true" />
-              </a>
+                <div className="home-copy">
+                  <p className="home-kicker">{copy.aboutKicker}</p>
+                  <h2 ref={overviewPageHeading} tabIndex={-1}>
+                    {copy.aboutRolePrefix}{' '}
+                    <span className="home-role-word" key={aboutRoleIndex}>
+                      {copy.aboutRoles[aboutRoleIndex]}
+                    </span>
+                  </h2>
+                  <p className="home-description">{copy.aboutIntroduction}</p>
+                  <button
+                    className="home-link"
+                    type="button"
+                    onClick={() => setAboutPageOpen(true)}
+                  >
+                    <span>{copy.discoverAbout}</span>
+                    <ArrowRight size={18} strokeWidth={1.8} aria-hidden="true" />
+                  </button>
+                  <nav className="home-nav" aria-label={copy.mainNavigation}>
+                    <a className="home-link" href="#percorso">
+                      <span>{copy.journeyNavigation}</span>
+                      <ArrowRight size={18} strokeWidth={1.8} aria-hidden="true" />
+                    </a>
+                    <a className="home-link" href="#progetti">
+                      <span>{copy.projectsNavigation}</span>
+                      <ArrowRight size={18} strokeWidth={1.8} aria-hidden="true" />
+                    </a>
+                    <a className="home-link" href="#contatti">
+                      <span>{copy.contactNavigation}</span>
+                      <ArrowRight size={18} strokeWidth={1.8} aria-hidden="true" />
+                    </a>
+                  </nav>
+                </div>
+              </div>
+
+              <div
+                className="profile-page profile-page--about"
+                aria-hidden={!aboutPageOpen}
+                inert={!aboutPageOpen}
+              >
+                <div
+                  className="portrait-placeholder portrait-placeholder--about"
+                  role="img"
+                  aria-label={copy.aboutImageAlt}
+                >
+                  <ImagePlus size={32} strokeWidth={1.5} aria-hidden="true" />
+                  <span className="portrait-caption">{copy.aboutImageCaption}</span>
+                  <span className="portrait-index">{copy.aboutImageIndex}</span>
+                </div>
+
+                <div className="about-page-copy">
+                  <p className="home-kicker">{copy.aboutPageKicker}</p>
+                  <h2 ref={aboutPageHeading} tabIndex={-1}>{copy.aboutPageTitle}</h2>
+                  {copy.aboutPageParagraphs.map((paragraph) => (
+                    <p className="about-page-description" key={paragraph}>{paragraph}</p>
+                  ))}
+                  <button
+                    className="home-link overview-return"
+                    type="button"
+                    onClick={() => setAboutPageOpen(false)}
+                  >
+                    <ArrowLeft size={18} strokeWidth={1.8} aria-hidden="true" />
+                    <span>{copy.overviewAction}</span>
+                  </button>
+                </div>
+              </div>
             </div>
           </section>
         </div>
