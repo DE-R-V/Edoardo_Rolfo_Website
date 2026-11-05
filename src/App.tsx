@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { faGithub, faLinkedin } from '@fortawesome/free-brands-svg-icons'
 import { faFileLines } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { ArrowDown, ArrowRight, ImagePlus } from 'lucide-react'
+import { ArrowDown, ArrowRight, ChevronDown, ImagePlus, X } from 'lucide-react'
 import './App.css'
 
 const profile = {
@@ -11,11 +11,192 @@ const profile = {
   githubUrl: 'https://github.com/tuo-username',
 }
 
+const resumeRequestRecipient = 'edoardo.rolfo.er@gmail.com'
+
 const socialProfiles = [
   { name: 'LinkedIn', url: profile.linkedinUrl, icon: faLinkedin },
   { name: 'GitHub', url: profile.githubUrl, icon: faGithub },
-  { name: 'Curriculum', url: '/curriculum.pdf', icon: faFileLines },
+  { name: 'resume', url: '/curriculum.pdf', icon: faFileLines },
 ]
+
+const translations = {
+  it: {
+    pageTitle: 'Portfolio personale',
+    pageDescription: 'Portfolio personale con una landing page a sipario.',
+    profilesLabel: 'Profili personali',
+    resumeLabel: 'Curriculum',
+    resumeRequestTitle: 'Richiedi il curriculum',
+    resumeRequestDescription: 'Compila i dati e prepara una richiesta da inviare via email.',
+    firstNameLabel: 'Nome',
+    lastNameLabel: 'Cognome',
+    companyLabel: 'Azienda',
+    companyLocationLabel: 'Località dell’azienda',
+    positionLabel: 'Posizione offerta o d’interesse',
+    recruiterEmailLabel: 'Email del recruiter a cui inviare il CV',
+    emailSubject: 'Richiesta curriculum',
+    openEmailAction: 'Apri email precompilata',
+    cancelAction: 'Annulla',
+    closeDialogLabel: 'Chiudi modulo',
+    languageLabel: 'Seleziona lingua / Select language',
+    scrollDesktop: 'Scorri per esplorare il sito',
+    scrollMobile: 'Scorri per visitare il sito',
+    mainNavigation: 'Navigazione principale',
+    profileNavigation: 'Profilo',
+    journeyNavigation: 'Percorso',
+    projectsNavigation: 'Progetti',
+    contactNavigation: 'Contatti',
+    portraitAlt: 'Spazio per una foto personale',
+    portraitCaption: 'La tua foto',
+    portraitIndex: 'RITRATTO / 01',
+    aboutKicker: 'CHI SONO',
+    introduction: 'Una breve presentazione.',
+    aboutDescription: 'Racconta qui il tuo percorso, di cosa ti occupi e cosa ti appassiona.',
+    discoverAbout: 'Scopri chi sono',
+    journeyKicker: '01 / FORMAZIONE E LAVORO',
+    journeyTitle: 'Il mio percorso',
+    journeyTimelineLabel: 'Timeline di formazione e lavoro',
+    journeyItems: [
+      {
+        kind: 'LAVORO',
+        date: '20XX — OGGI',
+        title: 'Il tuo ruolo professionale',
+        organization: 'Azienda / organizzazione',
+        description: 'Descrivi le tue responsabilità, il tuo impatto e i risultati.',
+      },
+      {
+        kind: 'FORMAZIONE',
+        date: '20XX — 20XX',
+        title: 'Il tuo percorso di studi',
+        organization: 'Università / istituto',
+        description: 'Aggiungi il corso di studi, le competenze o i traguardi principali.',
+      },
+      {
+        kind: 'FORMAZIONE',
+        date: '20XX — 20XX',
+        title: 'Formazione precedente',
+        organization: 'Scuola / istituto',
+        description: 'Puoi aggiungere qui un’altra tappa significativa.',
+      },
+    ],
+    projectsKicker: '02 / SELEZIONE',
+    projectsTitle: 'Progetti personali',
+    featuredProjectLabel: 'PROGETTO PERSONALE',
+    featuredProjectTitle: 'Il tuo progetto in evidenza',
+    featuredProjectDescription: 'Racconta il contesto, il tuo contributo e il risultato.',
+    secondProjectLabel: 'ESPERIMENTO',
+    secondProjectTitle: 'Un’idea da esplorare',
+    secondProjectDescription: 'Aggiungi una breve descrizione del progetto.',
+    thirdProjectLabel: 'STUDIO',
+    thirdProjectTitle: 'Un altro progetto',
+    thirdProjectDescription: 'Metti in luce ciò che rende unico questo lavoro.',
+    contactKicker: '03 / CONTATTI',
+    contactTitle: 'Contatti',
+    contactDescription: 'Email e altri riferimenti potranno trovare spazio qui.',
+    backToTop: 'Torna all’inizio',
+  },
+  en: {
+    pageTitle: 'Personal portfolio',
+    pageDescription: 'Personal portfolio with a curtain-style landing page.',
+    profilesLabel: 'Social profiles',
+    resumeLabel: 'Resume',
+    resumeRequestTitle: 'Request the CV',
+    resumeRequestDescription: 'Fill in the details to prepare an email request.',
+    firstNameLabel: 'First name',
+    lastNameLabel: 'Last name',
+    companyLabel: 'Company',
+    companyLocationLabel: 'Company location',
+    positionLabel: 'Position offered or of interest',
+    recruiterEmailLabel: 'Recruiter email to send the CV to',
+    emailSubject: 'CV request',
+    openEmailAction: 'Open prefilled email',
+    cancelAction: 'Cancel',
+    closeDialogLabel: 'Close form',
+    languageLabel: 'Select language / Seleziona lingua',
+    scrollDesktop: 'Scroll to explore the website',
+    scrollMobile: 'Scroll to visit the website',
+    mainNavigation: 'Main navigation',
+    profileNavigation: 'About',
+    journeyNavigation: 'Journey',
+    projectsNavigation: 'Projects',
+    contactNavigation: 'Contact',
+    portraitAlt: 'Space for a personal portrait',
+    portraitCaption: 'Your photo',
+    portraitIndex: 'PORTRAIT / 01',
+    aboutKicker: 'ABOUT',
+    introduction: 'A brief introduction.',
+    aboutDescription: 'Tell your story, what you do, and what you enjoy.',
+    discoverAbout: 'Get to know me',
+    journeyKicker: '01 / EDUCATION & WORK',
+    journeyTitle: 'My journey',
+    journeyTimelineLabel: 'Education and work timeline',
+    journeyItems: [
+      {
+        kind: 'WORK',
+        date: '20XX — PRESENT',
+        title: 'Your professional role',
+        organization: 'Company / organization',
+        description: 'Describe your responsibilities, impact, and results.',
+      },
+      {
+        kind: 'EDUCATION',
+        date: '20XX — 20XX',
+        title: 'Your studies',
+        organization: 'University / institution',
+        description: 'Add your course of study, skills, or key milestones.',
+      },
+      {
+        kind: 'EDUCATION',
+        date: '20XX — 20XX',
+        title: 'Earlier education',
+        organization: 'School / institution',
+        description: 'Add another meaningful milestone here.',
+      },
+    ],
+    projectsKicker: '02 / SELECTED WORK',
+    projectsTitle: 'Personal Projects',
+    featuredProjectLabel: 'PERSONAL PROJECT',
+    featuredProjectTitle: 'Your featured project',
+    featuredProjectDescription: 'Share the context, your contribution, and the outcome.',
+    secondProjectLabel: 'EXPERIMENT',
+    secondProjectTitle: 'An idea to explore',
+    secondProjectDescription: 'Add a short description of the project.',
+    thirdProjectLabel: 'STUDY',
+    thirdProjectTitle: 'Another project',
+    thirdProjectDescription: 'Highlight what makes this work unique.',
+    contactKicker: '03 / CONTACT',
+    contactTitle: 'Contact',
+    contactDescription: 'Email and other details can go here.',
+    backToTop: 'Back to top',
+  },
+} as const
+
+type Language = keyof typeof translations
+
+function LanguageSelector({
+  language,
+  label,
+  onSelect,
+}: {
+  language: Language
+  label: string
+  onSelect: (language: Language) => void
+}) {
+  return (
+    <div className="language-selector" role="group" aria-label={label}>
+      {(['it', 'en'] as const).map((option) => (
+        <button
+          key={option}
+          className="language-option"
+          type="button"
+          aria-pressed={language === option}
+          onClick={() => onSelect(option)}
+        >
+          {option.toUpperCase()}
+        </button>
+      ))}
+    </div>
+  )
+}
 
 function ProfileName({
   className,
@@ -34,36 +215,72 @@ function ProfileName({
 function ProfileSocials({
   className,
   linkClassName,
+  profilesLabel,
+  resumeLabel,
+  onResumeClick,
   withTooltips = false,
 }: {
   className: string
   linkClassName: string
+  profilesLabel: string
+  resumeLabel: string
+  onResumeClick: () => void
   withTooltips?: boolean
 }) {
   return (
-    <nav className={className} aria-label="Profili personali">
-      {socialProfiles.map(({ name, url, icon }) => (
-        <a
-          key={name}
-          className={linkClassName}
-          href={url}
-          target="_blank"
-          rel="noreferrer"
-          aria-label={name}
-          title={name}
-        >
-          <FontAwesomeIcon icon={icon} aria-hidden="true" />
-          {withTooltips && (
-            <span className="home-social-tooltip" aria-hidden="true">{name}</span>
-          )}
-        </a>
-      ))}
+    <nav className={className} aria-label={profilesLabel}>
+      {socialProfiles.map(({ name, url, icon }) => {
+        const label = name === 'resume' ? resumeLabel : name
+        const content = (
+          <>
+            <FontAwesomeIcon icon={icon} aria-hidden="true" />
+            {withTooltips && (
+              <span className="home-social-tooltip" aria-hidden="true">{label}</span>
+            )}
+          </>
+        )
+
+        if (name === 'resume') {
+          return (
+            <button
+              key={name}
+              className={linkClassName}
+              type="button"
+              aria-label={label}
+              title={label}
+              onClick={onResumeClick}
+            >
+              {content}
+            </button>
+          )
+        }
+
+        return (
+          <a
+            key={name}
+            className={linkClassName}
+            href={url}
+            target="_blank"
+            rel="noreferrer"
+            aria-label={label}
+            title={label}
+          >
+            {content}
+          </a>
+        )
+      })}
     </nav>
   )
 }
 
 function App() {
   const [progress, setProgress] = useState(0)
+  const [language, setLanguage] = useState<Language>(() => (
+    window.localStorage.getItem('portfolio-language') === 'en' ? 'en' : 'it'
+  ))
+  const [resumeRequestOpen, setResumeRequestOpen] = useState(false)
+  const resumeRequestDialog = useRef<HTMLDialogElement>(null)
+  const copy = translations[language]
 
   useEffect(() => {
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
@@ -96,13 +313,84 @@ function App() {
     }
   }, [])
 
+  useEffect(() => {
+    document.documentElement.lang = language
+    document.title = copy.pageTitle
+    document.querySelector('meta[name="description"]')?.setAttribute('content', copy.pageDescription)
+    window.localStorage.setItem('portfolio-language', language)
+  }, [copy.pageDescription, copy.pageTitle, language])
+
+  useEffect(() => {
+    const dialog = resumeRequestDialog.current
+    if (!dialog) return
+
+    if (resumeRequestOpen && !dialog.open) dialog.showModal()
+    if (!resumeRequestOpen && dialog.open) dialog.close()
+  }, [resumeRequestOpen])
+
+  const handleResumeRequest = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    const formData = new FormData(event.currentTarget)
+    const values = {
+      firstName: String(formData.get('firstName')),
+      lastName: String(formData.get('lastName')),
+      company: String(formData.get('company')),
+      location: String(formData.get('location')),
+      position: String(formData.get('position')),
+      recruiterEmail: String(formData.get('recruiterEmail')),
+    }
+    const subject = `${copy.emailSubject} - ${values.company}`
+    const body = [
+      `${copy.firstNameLabel}: ${values.firstName}`,
+      `${copy.lastNameLabel}: ${values.lastName}`,
+      `${copy.companyLabel}: ${values.company}`,
+      `${copy.companyLocationLabel}: ${values.location}`,
+      `${copy.positionLabel}: ${values.position}`,
+      `${copy.recruiterEmailLabel}: ${values.recruiterEmail}`,
+    ].join('\n')
+
+    window.location.href = `mailto:${resumeRequestRecipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+    setResumeRequestOpen(false)
+  }
+
   const curtainProgress = progress * progress * (3 - 2 * progress)
   const revealVisibility = Math.min(curtainProgress * 1.35, 1)
+  const projectCards = [
+    {
+      number: '01',
+      style: 'featured',
+      label: copy.featuredProjectLabel,
+      title: copy.featuredProjectTitle,
+      description: copy.featuredProjectDescription,
+    },
+    {
+      number: '02',
+      style: 'idea',
+      label: copy.secondProjectLabel,
+      title: copy.secondProjectTitle,
+      description: copy.secondProjectDescription,
+    },
+    {
+      number: '03',
+      style: 'study',
+      label: copy.thirdProjectLabel,
+      title: copy.thirdProjectTitle,
+      description: copy.thirdProjectDescription,
+    },
+  ]
 
   return (
     <main className="landing">
-      <section className="reveal-track" aria-label="Portfolio">
-        <div className="scene">
+      <LanguageSelector
+        language={language}
+        label={copy.languageLabel}
+        onSelect={setLanguage}
+      />
+      <section className="reveal-track" aria-label={copy.pageTitle}>
+        <div
+          className="scene"
+          style={{ pointerEvents: curtainProgress >= 1 ? 'none' : 'auto' }}
+        >
           <div
             className="reveal-haze reveal-haze--deep"
             style={{ opacity: 0.4 * (1 - curtainProgress) }}
@@ -126,11 +414,14 @@ function App() {
             <ProfileSocials
               className="mobile-socials"
               linkClassName="mobile-social-link"
+              profilesLabel={copy.profilesLabel}
+              resumeLabel={copy.resumeLabel}
+              onResumeClick={() => setResumeRequestOpen(true)}
             />
             <div className="scroll-invitation">
               <ArrowDown size={20} strokeWidth={1.8} aria-hidden="true" />
-              <span className="scroll-copy--desktop">Scroll to explore the website</span>
-              <span className="scroll-copy--mobile">Scroll to visit the website</span>
+              <span className="scroll-copy--desktop">{copy.scrollDesktop}</span>
+              <span className="scroll-copy--mobile">{copy.scrollMobile}</span>
             </div>
           </div>
         </div>
@@ -151,31 +442,33 @@ function App() {
               <ProfileSocials
                 className="home-socials"
                 linkClassName="home-social-link"
+                profilesLabel={copy.profilesLabel}
+                resumeLabel={copy.resumeLabel}
+                onResumeClick={() => setResumeRequestOpen(true)}
                 withTooltips
               />
             </div>
-            <nav className="home-nav" aria-label="Navigazione principale">
-              <a href="#profilo">Profilo</a>
-              <a href="#progetti">Progetti</a>
-              <a href="#contatti">Contatti</a>
+            <nav className="home-nav" aria-label={copy.mainNavigation}>
+              <a href="#profilo">{copy.profileNavigation}</a>
+              <a href="#percorso">{copy.journeyNavigation}</a>
+              <a href="#progetti">{copy.projectsNavigation}</a>
+              <a href="#contatti">{copy.contactNavigation}</a>
             </nav>
           </header>
 
           <section className="home-hero" id="profilo">
-            <div className="portrait-placeholder" role="img" aria-label="Spazio per una foto personale">
+            <div className="portrait-placeholder" role="img" aria-label={copy.portraitAlt}>
               <ImagePlus size={32} strokeWidth={1.5} aria-hidden="true" />
-              <span className="portrait-caption">La tua foto</span>
-              <span className="portrait-index">RITRATTO / 01</span>
+              <span className="portrait-caption">{copy.portraitCaption}</span>
+              <span className="portrait-index">{copy.portraitIndex}</span>
             </div>
 
             <div className="home-copy">
-              <p className="home-kicker">CHI SONO</p>
-              <h2>Una breve presentazione.</h2>
-              <p className="home-description">
-                Racconta qui il tuo percorso, di cosa ti occupi e cosa ti appassiona.
-              </p>
-              <a className="home-link" href="#progetti">
-                <span>Scopri i progetti</span>
+              <p className="home-kicker">{copy.aboutKicker}</p>
+              <h2>{copy.introduction}</h2>
+              <p className="home-description">{copy.aboutDescription}</p>
+              <a className="home-link" href="#percorso">
+                <span>{copy.discoverAbout}</span>
                 <ArrowRight size={18} strokeWidth={1.8} aria-hidden="true" />
               </a>
             </div>
@@ -183,16 +476,135 @@ function App() {
         </div>
       </section>
 
+      <section className="journey-section" id="percorso" aria-labelledby="journey-title">
+        <div className="section-shell">
+          <div className="journey-heading">
+            <p className="section-kicker">{copy.journeyKicker}</p>
+            <h2 id="journey-title">{copy.journeyTitle}</h2>
+          </div>
+          <div className="journey-rail" role="region" aria-label={copy.journeyTimelineLabel} tabIndex={0}>
+            <ol className="journey-list">
+              {copy.journeyItems.map((item) => (
+                <li
+                  className={`journey-entry${item.kind === 'WORK' || item.kind === 'LAVORO' ? ' journey-entry--work' : ''}`}
+                  key={`${item.date}-${item.title}`}
+                >
+                  <span className="journey-marker" aria-hidden="true" />
+                  <details className="journey-disclosure">
+                    <summary className="journey-summary">
+                      <span className="journey-meta">
+                        <time className="journey-date">{item.date}</time>
+                        <span className="journey-kind">{item.kind}</span>
+                      </span>
+                      <h3>{item.title}</h3>
+                      <span className="journey-expand" aria-hidden="true">
+                        <ChevronDown size={18} strokeWidth={1.8} />
+                      </span>
+                    </summary>
+                    <div className="journey-details">
+                      <p className="journey-organization">{item.organization}</p>
+                      <p className="journey-description">{item.description}</p>
+                    </div>
+                  </details>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </div>
+      </section>
+
+      <dialog
+        className="resume-request-dialog"
+        ref={resumeRequestDialog}
+        aria-labelledby="resume-request-title"
+        onCancel={() => setResumeRequestOpen(false)}
+        onClose={() => setResumeRequestOpen(false)}
+      >
+        <div className="resume-request-header">
+          <div>
+            <h2 id="resume-request-title">{copy.resumeRequestTitle}</h2>
+            <p>{copy.resumeRequestDescription}</p>
+          </div>
+          <button
+            className="resume-request-close"
+            type="button"
+            aria-label={copy.closeDialogLabel}
+            onClick={() => setResumeRequestOpen(false)}
+          >
+            <X size={20} aria-hidden="true" />
+          </button>
+        </div>
+        <form className="resume-request-form" onSubmit={handleResumeRequest}>
+          <label>
+            <span>{copy.firstNameLabel}</span>
+            <input autoComplete="given-name" name="firstName" required />
+          </label>
+          <label>
+            <span>{copy.lastNameLabel}</span>
+            <input autoComplete="family-name" name="lastName" required />
+          </label>
+          <label>
+            <span>{copy.companyLabel}</span>
+            <input autoComplete="organization" name="company" required />
+          </label>
+          <label>
+            <span>{copy.companyLocationLabel}</span>
+            <input name="location" required />
+          </label>
+          <label className="resume-request-field--wide">
+            <span>{copy.positionLabel}</span>
+            <input name="position" required />
+          </label>
+          <label className="resume-request-field--wide">
+            <span>{copy.recruiterEmailLabel}</span>
+            <input autoComplete="email" name="recruiterEmail" type="email" required />
+          </label>
+          <div className="resume-request-actions resume-request-field--wide">
+            <button
+              className="resume-request-cancel"
+              type="button"
+              onClick={() => setResumeRequestOpen(false)}
+            >
+              {copy.cancelAction}
+            </button>
+            <button className="resume-request-submit" type="submit">
+              {copy.openEmailAction}
+              <ArrowRight size={16} aria-hidden="true" />
+            </button>
+          </div>
+        </form>
+      </dialog>
+
       <section className="projects-section" id="progetti">
         <div className="section-shell">
           <div className="section-heading">
-            <p className="section-kicker">01 / SELEZIONE</p>
-            <h2>Progetti</h2>
+            <p className="section-kicker">{copy.projectsKicker}</p>
+            <h2>{copy.projectsTitle}</h2>
           </div>
-          <div className="project-note">
-            <span className="project-index">01</span>
-            <p>Una selezione dei lavori e delle idee che raccontano il tuo percorso.</p>
-            <ArrowRight size={20} strokeWidth={1.6} aria-hidden="true" />
+          <div className="projects-mosaic">
+            {projectCards.map((project) => (
+              <article
+                className={`project-card project-card--${project.style}`}
+                key={project.number}
+              >
+                <div className={`project-art project-art--${project.style}`} aria-hidden="true">
+                  <span className="project-art-number">{project.number}</span>
+                  <div className="project-art-frame">
+                    <span className="project-art-rule" />
+                    <div className="project-art-lines">
+                      <span />
+                      <span />
+                      <span />
+                    </div>
+                  </div>
+                </div>
+                <div className="project-card-copy">
+                  <p className="project-card-label">{project.label}</p>
+                  <h3>{project.title}</h3>
+                  <p className="project-card-description">{project.description}</p>
+                </div>
+              </article>
+            ))}
           </div>
         </div>
       </section>
@@ -200,14 +612,12 @@ function App() {
       <section className="contact-section" id="contatti">
         <div className="section-shell contact-shell">
           <div>
-            <p className="section-kicker">02 / CONTATTI</p>
-            <h2>Contatti</h2>
+            <p className="section-kicker">{copy.contactKicker}</p>
+            <h2>{copy.contactTitle}</h2>
           </div>
-          <p className="contact-note">
-            Email e altri riferimenti potranno trovare spazio qui.
-          </p>
+          <p className="contact-note">{copy.contactDescription}</p>
           <a className="contact-return" href="#home">
-            Torna all’inizio
+            {copy.backToTop}
             <ArrowRight size={18} strokeWidth={1.8} aria-hidden="true" />
           </a>
         </div>
