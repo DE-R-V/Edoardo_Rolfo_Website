@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { faGithub, faLinkedin } from '@fortawesome/free-brands-svg-icons'
-import { faFileLines } from '@fortawesome/free-solid-svg-icons'
+import { faEnvelope, faFileLines } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { ArrowDown, ArrowLeft, ArrowRight, ChevronDown, ImagePlus, X } from 'lucide-react'
 import './App.css'
@@ -43,6 +43,7 @@ const translations = {
     mainNavigation: 'Navigazione principale',
     journeyNavigation: 'Percorso',
     projectsNavigation: 'Progetti',
+    skillsNavigation: 'Competenze',
     contactNavigation: 'Contatti',
     portraitAlt: 'Spazio per una foto personale',
     portraitCaption: 'La tua foto',
@@ -51,7 +52,7 @@ const translations = {
     aboutRolePrefix: 'Sono il tuo futuro',
     aboutRoles: ['collega', 'amico', 'software developer'],
     aboutIntroduction: 'Sono Edoardo, software developer con oltre 3 anni di esperienza professionale e una laurea magistrale in Informatica.',
-    discoverAbout: 'Scopri chi sono',
+    discoverAbout: 'Su di me',
     aboutPageKicker: 'OLTRE LA PANORAMICA',
     aboutPageTitle: 'Mi piace creare cose utili, insieme.',
     aboutPageParagraphs: [
@@ -99,9 +100,18 @@ const translations = {
     thirdProjectLabel: 'STUDIO',
     thirdProjectTitle: 'Un altro progetto',
     thirdProjectDescription: 'Metti in luce ciò che rende unico questo lavoro.',
-    contactKicker: '03 / CONTATTI',
+    skillsKicker: '03 / COMPETENZE',
+    skillsTitle: 'Le mie competenze',
+    skillsItems: [
+      { title: 'Sviluppo software', description: 'Oltre 3 anni di esperienza professionale.' },
+      { title: 'Lavoro di squadra', description: 'Condivisione delle conoscenze e collaborazione.' },
+      { title: 'Approccio', description: 'Determinazione, attenzione ai dettagli e orientamento all’impatto.' },
+      { title: 'Lingue', description: 'Italiano madrelingua · Inglese C1 · Svedese A1/A2.' },
+    ],
+    contactKicker: '04 / CONTATTI',
     contactTitle: 'Contatti',
-    contactDescription: 'Email e altri riferimenti potranno trovare spazio qui.',
+    contactDescription: 'Per opportunità e collaborazioni, scrivimi via email o sui miei profili:',
+    contactEmailLabel: 'Scrivimi via email',
     backToTop: 'Torna all’inizio',
   },
   en: {
@@ -127,6 +137,7 @@ const translations = {
     mainNavigation: 'Main navigation',
     journeyNavigation: 'Journey',
     projectsNavigation: 'Projects',
+    skillsNavigation: 'Skills',
     contactNavigation: 'Contact',
     portraitAlt: 'Space for a personal portrait',
     portraitCaption: 'Your photo',
@@ -135,7 +146,7 @@ const translations = {
     aboutRolePrefix: 'I could be your future',
     aboutRoles: ['colleague', 'friend', 'software developer'],
     aboutIntroduction: 'I’m Edoardo, a software developer with 3+ years of professional experience and a master’s degree in Computer Science.',
-    discoverAbout: 'Get to know me',
+    discoverAbout: 'About me',
     aboutPageKicker: 'BEYOND THE OVERVIEW',
     aboutPageTitle: 'I like building useful things, together.',
     aboutPageParagraphs: [
@@ -183,9 +194,18 @@ const translations = {
     thirdProjectLabel: 'STUDY',
     thirdProjectTitle: 'Another project',
     thirdProjectDescription: 'Highlight what makes this work unique.',
-    contactKicker: '03 / CONTACT',
+    skillsKicker: '03 / SKILLS',
+    skillsTitle: 'Skills',
+    skillsItems: [
+      { title: 'Software development', description: 'More than 3 years of professional experience.' },
+      { title: 'Teamwork', description: 'Sharing knowledge and collaborating with others.' },
+      { title: 'Approach', description: 'Determination, attention to detail, and a focus on impact.' },
+      { title: 'Languages', description: 'Native Italian · English C1 · Swedish A1/A2.' },
+    ],
+    contactKicker: '04 / CONTACT',
     contactTitle: 'Contact',
-    contactDescription: 'Email and other details can go here.',
+    contactDescription: 'For opportunities and collaborations, reach me by email or on my profiles:',
+    contactEmailLabel: 'Email me',
     backToTop: 'Back to top',
   },
 } as const
@@ -239,6 +259,7 @@ function ProfileSocials({
   resumeLabel,
   onResumeClick,
   withTooltips = false,
+  withLabels = false,
 }: {
   className: string
   linkClassName: string
@@ -246,6 +267,7 @@ function ProfileSocials({
   resumeLabel: string
   onResumeClick: () => void
   withTooltips?: boolean
+  withLabels?: boolean
 }) {
   return (
     <nav className={className} aria-label={profilesLabel}>
@@ -254,6 +276,7 @@ function ProfileSocials({
         const content = (
           <>
             <FontAwesomeIcon icon={icon} aria-hidden="true" />
+            {withLabels && <span>{label}</span>}
             {withTooltips && (
               <span className="home-social-tooltip" aria-hidden="true">{label}</span>
             )}
@@ -540,6 +563,7 @@ function App() {
                     <span>{copy.discoverAbout}</span>
                     <ArrowRight size={18} strokeWidth={1.8} aria-hidden="true" />
                   </button>
+                  <span className="home-nav-divider" aria-hidden="true" />
                   <nav className="home-nav" aria-label={copy.mainNavigation}>
                     <a className="home-link" href="#percorso">
                       <span>{copy.journeyNavigation}</span>
@@ -549,6 +573,11 @@ function App() {
                       <span>{copy.projectsNavigation}</span>
                       <ArrowRight size={18} strokeWidth={1.8} aria-hidden="true" />
                     </a>
+                    <a className="home-link" href="#skills">
+                      <span>{copy.skillsNavigation}</span>
+                      <ArrowRight size={18} strokeWidth={1.8} aria-hidden="true" />
+                    </a>
+                    <span className="home-nav-divider" aria-hidden="true" />
                     <a className="home-link" href="#contatti">
                       <span>{copy.contactNavigation}</span>
                       <ArrowRight size={18} strokeWidth={1.8} aria-hidden="true" />
@@ -595,7 +624,7 @@ function App() {
 
       <section className="journey-section" id="percorso" aria-labelledby="journey-title">
         <div className="section-shell">
-          <div className="journey-heading">
+          <div className="section-heading journey-heading">
             <p className="section-kicker">{copy.journeyKicker}</p>
             <h2 id="journey-title">{copy.journeyTitle}</h2>
           </div>
@@ -726,17 +755,58 @@ function App() {
         </div>
       </section>
 
-      <section className="contact-section" id="contatti">
-        <div className="section-shell contact-shell">
-          <div>
-            <p className="section-kicker">{copy.contactKicker}</p>
-            <h2>{copy.contactTitle}</h2>
+      <section className="skills-section" id="skills" aria-labelledby="skills-title">
+        <div className="section-shell">
+          <div className="section-heading">
+            <p className="section-kicker">{copy.skillsKicker}</p>
+            <h2 id="skills-title">{copy.skillsTitle}</h2>
           </div>
-          <p className="contact-note">{copy.contactDescription}</p>
-          <a className="contact-return" href="#home">
-            {copy.backToTop}
-            <ArrowRight size={18} strokeWidth={1.8} aria-hidden="true" />
-          </a>
+          <div className="skills-list">
+            {copy.skillsItems.map((skill, index) => (
+              <article className="skill-item" key={skill.title}>
+                <span className="skill-item-index">{String(index + 1).padStart(2, '0')}</span>
+                <div>
+                  <h3>{skill.title}</h3>
+                  <p>{skill.description}</p>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="contact-section" id="contatti" aria-labelledby="contact-title">
+        <div className="section-shell">
+          <div className="section-heading section-heading--dark">
+            <p className="section-kicker">{copy.contactKicker}</p>
+            <h2 id="contact-title">{copy.contactTitle}</h2>
+          </div>
+          <div className="contact-shell">
+            <p className="contact-note">{copy.contactDescription}</p>
+            <div className="contact-details">
+              <a
+                className="contact-email"
+                href={`mailto:${resumeRequestRecipient}`}
+                aria-label={`${copy.contactEmailLabel}: ${resumeRequestRecipient}`}
+              >
+                <FontAwesomeIcon icon={faEnvelope} aria-hidden="true" />
+                <span>{resumeRequestRecipient}</span>
+                <ArrowRight size={18} strokeWidth={1.8} aria-hidden="true" />
+              </a>
+              <ProfileSocials
+                className="contact-socials"
+                linkClassName="contact-social-link"
+                profilesLabel={copy.profilesLabel}
+                resumeLabel={copy.resumeLabel}
+                onResumeClick={() => setResumeRequestOpen(true)}
+                withLabels
+              />
+            </div>
+            <a className="contact-return" href="#home">
+              {copy.backToTop}
+              <ArrowRight size={18} strokeWidth={1.8} aria-hidden="true" />
+            </a>
+          </div>
         </div>
       </section>
     </main>
