@@ -132,9 +132,10 @@ const translations = {
     ],
     contactKicker: '04 / CONTATTI',
     contactTitle: 'Contatti',
-    contactDescription: 'Cittadino UE, pronto a trasferirmi in Svezia senza necessità di sponsorship. Per opportunità e collaborazioni, scrivimi:',
+    contactDescription: 'Per opportunità e collaborazioni, scrivimi:',
     contactEmailLabel: 'Scrivimi via email',
     backToTop: 'Torna all’inizio',
+    siteCredit: 'Progettato e realizzato da Edoardo Rolfo con il supporto di Copilot.',
   },
   en: {
     pageTitle: 'Personal portfolio',
@@ -188,7 +189,7 @@ const translations = {
         kind: 'WORK',
         date: 'May 2024 — Present',
         title: 'Software Developer',
-        organization: 'Reply SPA, Turin',
+        organization: 'Reply S.p.A., Turin',
         summary: 'B2B infrastructure, iOS apps and XR projects.',
         description: [
           'Provisioned multi-tenant B2B backend infrastructure with Terraform and managed Kubernetes deployments with Helm.',
@@ -248,9 +249,10 @@ const translations = {
     ],
     contactKicker: '04 / CONTACT',
     contactTitle: 'Contact',
-    contactDescription: 'EU citizen, ready to relocate to Sweden with no visa sponsorship required. For opportunities and collaborations, get in touch:',
+    contactDescription: 'For opportunities and collaborations, get in touch:',
     contactEmailLabel: 'Email me',
     backToTop: 'Back to top',
+    siteCredit: 'Designed and built by Edoardo Rolfo with support from Copilot.',
   },
 } as const
 
@@ -918,6 +920,7 @@ function App() {
               {copy.backToTop}
               <ArrowRight size={18} strokeWidth={1.8} aria-hidden="true" />
             </a>
+            <p className="contact-attribution">{copy.siteCredit}</p>
           </div>
         </div>
       </section>

@@ -1264,6 +1264,15 @@ summary:active {
   margin-top: 8px;
 }
 
+.contact-attribution {
+  grid-column: 1 / -1;
+  margin: 28px 0 0;
+  color: rgba(247, 247, 244, 0.56);
+  font-size: 12px;
+  line-height: 1.5;
+  text-align: center;
+}
+
 @media (max-width: 900px) {
   .language-selector {
     top: 12px;
