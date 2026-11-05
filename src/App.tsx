@@ -11,6 +11,57 @@ const profile = {
   githubUrl: 'https://github.com/tuo-username',
 }
 
+const socialProfiles = [
+  { name: 'LinkedIn', url: profile.linkedinUrl, icon: faLinkedin },
+  { name: 'GitHub', url: profile.githubUrl, icon: faGithub },
+  { name: 'Curriculum', url: '/curriculum.pdf', icon: faFileLines },
+]
+
+function ProfileName({
+  className,
+  linked = false,
+}: {
+  className: string
+  linked?: boolean
+}) {
+  return (
+    <h1 className={className}>
+      {linked ? <a href="#home">{profile.name}</a> : profile.name}
+    </h1>
+  )
+}
+
+function ProfileSocials({
+  className,
+  linkClassName,
+  withTooltips = false,
+}: {
+  className: string
+  linkClassName: string
+  withTooltips?: boolean
+}) {
+  return (
+    <nav className={className} aria-label="Profili personali">
+      {socialProfiles.map(({ name, url, icon }) => (
+        <a
+          key={name}
+          className={linkClassName}
+          href={url}
+          target="_blank"
+          rel="noreferrer"
+          aria-label={name}
+          title={name}
+        >
+          <FontAwesomeIcon icon={icon} aria-hidden="true" />
+          {withTooltips && (
+            <span className="home-social-tooltip" aria-hidden="true">{name}</span>
+          )}
+        </a>
+      ))}
+    </nav>
+  )
+}
+
 function App() {
   const [progress, setProgress] = useState(0)
 
@@ -27,7 +78,10 @@ function App() {
         }
 
         const openingDistance = window.innerHeight * 1.1
-        setProgress(Math.min(window.scrollY / openingDistance, 1))
+        const nextProgress = window.scrollY >= openingDistance - 1
+          ? 1
+          : window.scrollY / openingDistance
+        setProgress(nextProgress)
       })
     }
 
@@ -42,56 +96,64 @@ function App() {
     }
   }, [])
 
+  const curtainProgress = progress * progress * (3 - 2 * progress)
+  const revealVisibility = Math.min(curtainProgress * 1.35, 1)
+
   return (
     <main className="landing">
       <section className="reveal-track" aria-label="Portfolio">
         <div className="scene">
-          <h1 className="mobile-name">{profile.name}</h1>
-          <div className="scroll-invitation" style={{ opacity: 1 - progress }}>
-            <ArrowDown size={20} strokeWidth={1.8} aria-hidden="true" />
-            <span className="scroll-copy--desktop">Scroll to lift the visor</span>
-            <span className="scroll-copy--mobile">Scroll to visit the website</span>
-          </div>
-
           <div
-            className="visor-panel visor-panel--top"
-            style={{ transform: `translate3d(0, ${-progress * 104}%, 0)` }}
-            aria-hidden="true"
-          >
-            <span className="visor-arc visor-arc--left" />
-            <span className="visor-arc visor-arc--right" />
-            <span className="visor-lens visor-lens--left" style={{ opacity: 1 - progress }}>
-              <span
-                className="visor-reflection-shift"
-                style={{ transform: `translate3d(${progress * 60}px, 0, 0)` }}
-              >
-                <span className="visor-reflection" />
-              </span>
-            </span>
-            <span className="visor-lens visor-lens--right" style={{ opacity: 1 - progress }}>
-              <span
-                className="visor-reflection-shift"
-                style={{ transform: `translate3d(${progress * 60}px, 0, 0)` }}
-              >
-                <span className="visor-reflection" />
-              </span>
-            </span>
-            <span className="nose-notch" />
-          </div>
-          <div
-            className="visor-panel visor-panel--bottom"
-            style={{ transform: `translate3d(0, ${progress * 104}%, 0)` }}
+            className="reveal-haze reveal-haze--deep"
+            style={{ opacity: 0.4 * (1 - curtainProgress) }}
             aria-hidden="true"
           />
+          <div
+            className="reveal-haze reveal-haze--surface"
+            style={{ opacity: 0.24 * (1 - curtainProgress) }}
+            aria-hidden="true"
+          />
+          <div
+            className="curtain-panel curtain-panel--top"
+            style={{ transform: `translate3d(0, ${-curtainProgress * 108}%, 0)` }}
+          >
+            <ProfileName className="mobile-name" />
+          </div>
+          <div
+            className="curtain-panel curtain-panel--bottom"
+            style={{ transform: `translate3d(0, ${curtainProgress * 108}%, 0)` }}
+          >
+            <ProfileSocials
+              className="mobile-socials"
+              linkClassName="mobile-social-link"
+            />
+            <div className="scroll-invitation">
+              <ArrowDown size={20} strokeWidth={1.8} aria-hidden="true" />
+              <span className="scroll-copy--desktop">Scroll to explore the website</span>
+              <span className="scroll-copy--mobile">Scroll to visit the website</span>
+            </div>
+          </div>
         </div>
       </section>
 
-      <section className="home-section" id="home">
+      <section
+        className={`home-section${curtainProgress < 1 ? ' home-section--pinned' : ''}`}
+        id="home"
+        style={{
+          opacity: revealVisibility,
+          filter: `blur(${(1 - curtainProgress) * 8}px)`,
+        }}
+      >
         <div className="home-shell">
           <header className="home-header">
-            <h1 className="home-wordmark">
-              <a href="#home">{profile.name}</a>
-            </h1>
+            <div className="home-identity">
+              <ProfileName className="home-wordmark" linked />
+              <ProfileSocials
+                className="home-socials"
+                linkClassName="home-social-link"
+                withTooltips
+              />
+            </div>
             <nav className="home-nav" aria-label="Navigazione principale">
               <a href="#profilo">Profilo</a>
               <a href="#progetti">Progetti</a>
@@ -112,41 +174,6 @@ function App() {
               <p className="home-description">
                 Racconta qui il tuo percorso, di cosa ti occupi e cosa ti appassiona.
               </p>
-              <nav className="home-socials" aria-label="Profili personali">
-                <a
-                  className="home-social-link"
-                  href={profile.linkedinUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  aria-label="LinkedIn"
-                  title="LinkedIn"
-                >
-                  <FontAwesomeIcon icon={faLinkedin} aria-hidden="true" />
-                  <span className="home-social-tooltip" aria-hidden="true">LinkedIn</span>
-                </a>
-                <a
-                  className="home-social-link"
-                  href={profile.githubUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  aria-label="GitHub"
-                  title="GitHub"
-                >
-                  <FontAwesomeIcon icon={faGithub} aria-hidden="true" />
-                  <span className="home-social-tooltip" aria-hidden="true">GitHub</span>
-                </a>
-                <a
-                  className="home-social-link"
-                  href="/curriculum.pdf"
-                  target="_blank"
-                  rel="noreferrer"
-                  aria-label="Curriculum"
-                  title="Curriculum"
-                >
-                  <FontAwesomeIcon icon={faFileLines} aria-hidden="true" />
-                  <span className="home-social-tooltip" aria-hidden="true">Curriculum</span>
-                </a>
-              </nav>
               <a className="home-link" href="#progetti">
                 <span>Scopri i progetti</span>
                 <ArrowRight size={18} strokeWidth={1.8} aria-hidden="true" />
