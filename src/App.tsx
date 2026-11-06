@@ -9,11 +9,10 @@ import {
   Cloud,
   Eye,
   GitBranch,
-  Heart,
   ImagePlus,
-  Languages,
   List,
   MessageCircle,
+  Puzzle,
   RefreshCw,
   Smartphone,
   Users,
@@ -35,7 +34,7 @@ const socialProfiles = [
   { name: 'resume', url: '/curriculum.pdf', icon: faFileLines },
 ]
 
-const skillAreaIcons = [Cloud, Smartphone, Eye, GitBranch, RefreshCw, Users, MessageCircle, Heart] as const
+const skillAreaIcons = [Cloud, Smartphone, Eye, GitBranch, RefreshCw, Users, MessageCircle, Puzzle] as const
 
 const translations = {
   it: {
@@ -65,7 +64,7 @@ const translations = {
     contactNavigation: 'Contatti',
     skillsViewsLabel: 'Visualizzazione competenze',
     skillsListView: 'Lista',
-    skillsFusionView: 'Perché?',
+    skillsFusionView: 'Come?',
     portraitAlt: 'Spazio per una foto personale',
     portraitCaption: 'La tua foto',
     portraitIndex: 'RITRATTO / 01',
@@ -152,17 +151,24 @@ const translations = {
     softSkillsGroup: 'SOFT SKILLS',
     skillsLanguagesTitle: 'LINGUE',
     skillsLanguages: ['Italiano madrelingua', 'Inglese C1', 'Svedese A1'],
+    skillsGeneralTitle: 'Sviluppo software',
+    skillsGeneral: [
+      'Architettura software e design pattern',
+      'Programmazione a oggetti e principi SOLID',
+      'Testing automatico',
+      'Algoritmi e strutture dati',
+    ],
     skillsCombinationTitle: 'Esempio concreto',
     skillsCombinationEmpty: 'Per questa coppia non c’è ancora un esempio da raccontare.',
     skillsItems: [
-      { title: 'Cloud e infrastruttura', description: 'Terraform, Helm, AWS, Kubernetes.' },
-      { title: 'Sviluppo iOS', description: 'Swift, SwiftUI, UIKit.' },
-      { title: 'XR, VR & Computer Vision', description: 'Unity, C#, XR Development.' },
-      { title: 'Delivery', description: 'Agile, DevOps, Git, GitLab CI/CD.' },
+      { title: 'Cloud e infrastruttura', description: 'Terraform & AWS, Helm & Kubernetes.' },
+      { title: 'Sviluppo iOS', description: 'Swift, SwiftUI & UIKit.' },
+      { title: 'XR, VR & Computer Vision', description: 'Unity & C#, XR Development.' },
+      { title: 'Delivery', description: 'DevOps, Git & GitLab CI/CD.' },
       { title: 'Adattabilità', description: 'Adattabilità.' },
       { title: 'Spirito di squadra', description: 'Spirito di squadra.' },
       { title: 'Apertura al feedback', description: 'Apertura al feedback.' },
-      { title: 'Attenzione alle persone', description: 'Attenzione alle persone.' },
+      { title: 'Problem solving', description: 'Problem solving.' },
     ],
     skillCombinationDescriptions: {
       '2:0': {
@@ -212,7 +218,7 @@ const translations = {
     contactNavigation: 'Contact',
     skillsViewsLabel: 'Skills view',
     skillsListView: 'List',
-    skillsFusionView: 'Why?',
+    skillsFusionView: 'How?',
     portraitAlt: 'Space for a personal portrait',
     portraitCaption: 'Your photo',
     portraitIndex: 'PORTRAIT / 01',
@@ -299,17 +305,24 @@ const translations = {
     softSkillsGroup: 'SOFT SKILLS',
     skillsLanguagesTitle: 'LANGUAGES',
     skillsLanguages: ['Native Italian', 'English C1', 'Swedish A1'],
+    skillsGeneralTitle: 'Software development',
+    skillsGeneral: [
+      'Software architecture & design patterns',
+      'Object-oriented programming & SOLID',
+      'Automated testing',
+      'Algorithms & data structures',
+    ],
     skillsCombinationTitle: 'A real example',
     skillsCombinationEmpty: 'There is no example to share for this pairing yet.',
     skillsItems: [
-      { title: 'Cloud & infrastructure', description: 'Terraform, Helm, AWS, Kubernetes.' },
-      { title: 'iOS development', description: 'Swift, SwiftUI, UIKit.' },
-      { title: 'XR, VR & Computer Vision', description: 'Unity, C#, XR development.' },
-      { title: 'Delivery', description: 'Agile, DevOps, Git, GitLab CI/CD.' },
+      { title: 'Cloud & infrastructure', description: 'Terraform & AWS, Helm & Kubernetes.' },
+      { title: 'iOS development', description: 'Swift, SwiftUI & UIKit.' },
+      { title: 'XR, VR & Computer Vision', description: 'Unity & C#, XR development.' },
+      { title: 'Delivery', description: 'DevOps, Git & GitLab CI/CD.' },
       { title: 'Adaptability', description: 'Adaptability.' },
       { title: 'Teamwork', description: 'Teamwork.' },
       { title: 'Feedback-driven', description: 'Feedback-driven.' },
-      { title: 'People-oriented', description: 'People-oriented.' },
+      { title: 'Problem solving', description: 'Problem solving.' },
     ],
     skillCombinationDescriptions: {
       '2:0': {
@@ -1066,6 +1079,12 @@ function App() {
                     </ul>
                   </div>
                 ))}
+                <div className="skills-inventory-domain skills-inventory-domain--general">
+                  <h4>{copy.skillsGeneralTitle}</h4>
+                  <ul className="skill-tags">
+                    {copy.skillsGeneral.map((skill) => <li className="skill-tag" key={skill}>{skill}</li>)}
+                  </ul>
+                </div>
               </div>
             </section>
             <section className="skills-inventory-group skills-inventory-group--soft" aria-labelledby="skills-soft-title">
@@ -1075,10 +1094,7 @@ function App() {
               </ul>
             </section>
             <section className="skills-inventory-group skills-inventory-group--languages" aria-labelledby="skills-languages-title">
-              <div className="skills-languages-heading">
-                <Languages size={17} strokeWidth={1.8} aria-hidden="true" />
-                <h3 id="skills-languages-title">{copy.skillsLanguagesTitle}</h3>
-              </div>
+              <h3 id="skills-languages-title">{copy.skillsLanguagesTitle}</h3>
               <ul className="skills-simple-list">
                 {copy.skillsLanguages.map((item) => <li key={item}>{item}</li>)}
               </ul>
@@ -1095,7 +1111,7 @@ function App() {
               >
                 <List size={18} strokeWidth={1.8} aria-hidden="true" />
                 <span>{copy.skillsListView}</span>
-                <ArrowRight size={16} strokeWidth={1.8} aria-hidden="true" />
+                <ArrowLeft size={16} strokeWidth={1.8} aria-hidden="true" />
               </button>
             </div>
             <div className="skills-view-pane skills-view-pane--fusion">
@@ -1118,6 +1134,26 @@ function App() {
                     className={`skills-wheel-column ${groupIndex === 0 ? 'skills-wheel-column--technical' : 'skills-wheel-column--soft'}`}
                     key={group.title}
                   >
+                    <span className="skills-gear-title">{group.title}</span>
+                    <div className="skills-wheel-controls skills-gear-selector">
+                      <button
+                        className="skills-wheel-arrow"
+                        type="button"
+                        aria-label={`${group.title}: ${copy.previousSkill}`}
+                        onClick={() => selectSkill(groupIndex, selectedIndex - 1, -1)}
+                      >
+                        <ArrowLeft size={18} strokeWidth={1.8} aria-hidden="true" />
+                      </button>
+                      <span className="skills-wheel-selected-skill" aria-live="polite">{group.skills[selectedIndex]?.title}</span>
+                      <button
+                        className="skills-wheel-arrow"
+                        type="button"
+                        aria-label={`${group.title}: ${copy.nextSkill}`}
+                        onClick={() => selectSkill(groupIndex, selectedIndex + 1, 1)}
+                      >
+                        <ArrowRight size={18} strokeWidth={1.8} aria-hidden="true" />
+                      </button>
+                    </div>
                     <div
                       className="skills-orbit"
                       role="group"
@@ -1161,25 +1197,6 @@ function App() {
                         })}
                       </div>
                       <div className="skills-orbit-center" aria-hidden="true" />
-                    </div>
-                    <div className="skills-wheel-controls">
-                      <button
-                        className="skills-wheel-arrow"
-                        type="button"
-                        aria-label={copy.previousSkill}
-                        onClick={() => selectSkill(groupIndex, selectedIndex - 1, -1)}
-                      >
-                        <ArrowLeft size={18} strokeWidth={1.8} aria-hidden="true" />
-                      </button>
-                      <span className="skills-wheel-selected-skill" aria-live="polite">{group.skills[selectedIndex]?.title}</span>
-                      <button
-                        className="skills-wheel-arrow"
-                        type="button"
-                        aria-label={copy.nextSkill}
-                        onClick={() => selectSkill(groupIndex, selectedIndex + 1, 1)}
-                      >
-                        <ArrowRight size={18} strokeWidth={1.8} aria-hidden="true" />
-                      </button>
                     </div>
                   </div>
                 )
@@ -1310,7 +1327,7 @@ function App() {
               >
                 <MessageCircle size={18} strokeWidth={1.8} aria-hidden="true" />
                 <span>{copy.skillsFusionView}</span>
-                <ArrowLeft size={16} strokeWidth={1.8} aria-hidden="true" />
+                <ArrowRight size={16} strokeWidth={1.8} aria-hidden="true" />
               </button>
             </div>
           </div>
@@ -1349,6 +1366,9 @@ function App() {
               <ArrowRight size={18} strokeWidth={1.8} aria-hidden="true" />
             </a>
             <p className="contact-attribution">{copy.siteCredit}</p>
+            <div className="contact-language-selector">
+              <LanguageSelector language={language} label={copy.languageLabel} onSelect={setLanguage} />
+            </div>
           </div>
         </div>
       </section>
