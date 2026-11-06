@@ -441,6 +441,34 @@ function App() {
   }, [selectedJourneyItem])
 
   useEffect(() => {
+    const journey = journeyDialog.current
+    const resume = resumeRequestDialog.current
+    if (!journey || !resume) return
+
+    const closeOnBackdrop = (dialog: HTMLDialogElement, close: () => void) => (event: MouseEvent) => {
+      const bounds = dialog.getBoundingClientRect()
+      if (
+        event.clientX < bounds.left ||
+        event.clientX > bounds.right ||
+        event.clientY < bounds.top ||
+        event.clientY > bounds.bottom
+      ) {
+        close()
+      }
+    }
+
+    const closeJourneyOnBackdrop = closeOnBackdrop(journey, () => setSelectedJourneyItem(null))
+    const closeResumeOnBackdrop = closeOnBackdrop(resume, () => setResumeRequestOpen(false))
+    journey.addEventListener('click', closeJourneyOnBackdrop)
+    resume.addEventListener('click', closeResumeOnBackdrop)
+
+    return () => {
+      journey.removeEventListener('click', closeJourneyOnBackdrop)
+      resume.removeEventListener('click', closeResumeOnBackdrop)
+    }
+  }, [])
+
+  useEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
 
     const interval = window.setInterval(() => {
@@ -523,11 +551,6 @@ function App() {
 
   return (
     <main className="landing">
-      <LanguageSelector
-        language={language}
-        label={copy.languageLabel}
-        onSelect={setLanguage}
-      />
       <section className="reveal-track" aria-label={copy.pageTitle}>
         <div
           className="scene"
@@ -547,6 +570,13 @@ function App() {
             className="curtain-panel curtain-panel--top"
             style={{ transform: `translate3d(0, ${-curtainProgress * 108}%, 0)` }}
           >
+            {curtainProgress < 0.85 && (
+              <LanguageSelector
+                language={language}
+                label={copy.languageLabel}
+                onSelect={setLanguage}
+              />
+            )}
             <ProfileName className="mobile-name" />
           </div>
           <div
@@ -583,14 +613,23 @@ function App() {
         <div className="home-shell">
           <header className="home-header">
             <ProfileName className="home-wordmark" linked />
-            <ProfileSocials
-              className="home-socials"
-              linkClassName="home-social-link"
-              profilesLabel={copy.profilesLabel}
-              resumeLabel={copy.resumeLabel}
-              onResumeClick={() => setResumeRequestOpen(true)}
-              withTooltips
-            />
+            <div className="home-header-tools">
+              <ProfileSocials
+                className="home-socials"
+                linkClassName="home-social-link"
+                profilesLabel={copy.profilesLabel}
+                resumeLabel={copy.resumeLabel}
+                onResumeClick={() => setResumeRequestOpen(true)}
+                withTooltips
+              />
+              {curtainProgress >= 0.85 && (
+                <LanguageSelector
+                  language={language}
+                  label={copy.languageLabel}
+                  onSelect={setLanguage}
+                />
+              )}
+            </div>
           </header>
 
           <section className="home-hero" id="profilo">
