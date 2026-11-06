@@ -2,13 +2,29 @@ import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { faGithub, faLinkedin } from '@fortawesome/free-brands-svg-icons'
 import { faEnvelope, faFileLines } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { ArrowDown, ArrowLeft, ArrowRight, ImagePlus, X } from 'lucide-react'
+import {
+  ArrowDown,
+  ArrowLeft,
+  ArrowRight,
+  Cloud,
+  Eye,
+  GitBranch,
+  Heart,
+  ImagePlus,
+  Languages,
+  List,
+  MessageCircle,
+  RefreshCw,
+  Smartphone,
+  Users,
+  X,
+} from 'lucide-react'
 import './App.css'
 
 const profile = {
   name: 'Edoardo Rolfo',
-  linkedinUrl: 'https://www.linkedin.com/in/tuo-profilo/',
-  githubUrl: 'https://github.com/tuo-username',
+  linkedinUrl: 'https://www.linkedin.com/in/edoardo-rolfo',
+  githubUrl: 'https://github.com/DE-R-V',
 }
 
 const resumeRequestRecipient = 'edoardo.rolfo.er@gmail.com'
@@ -18,6 +34,8 @@ const socialProfiles = [
   { name: 'GitHub', url: profile.githubUrl, icon: faGithub },
   { name: 'resume', url: '/curriculum.pdf', icon: faFileLines },
 ]
+
+const skillAreaIcons = [Cloud, Smartphone, Eye, GitBranch, RefreshCw, Users, MessageCircle, Heart] as const
 
 const translations = {
   it: {
@@ -45,6 +63,9 @@ const translations = {
     projectsNavigation: 'Progetti',
     skillsNavigation: 'Competenze',
     contactNavigation: 'Contatti',
+    skillsViewsLabel: 'Visualizzazione competenze',
+    skillsListView: 'Lista',
+    skillsFusionView: 'Perché?',
     portraitAlt: 'Spazio per una foto personale',
     portraitCaption: 'La tua foto',
     portraitIndex: 'RITRATTO / 01',
@@ -122,14 +143,41 @@ const translations = {
     secondProjectDescription: 'App XR per workflow assicurativi con ricostruzione 3D della scena tramite Gaussian Splatting, selezionata per XR Creator Con 2026.',
     skillsKicker: '03 / COMPETENZE',
     skillsTitle: 'Le mie competenze',
+    skillsFusionTitle: 'Come contribuiscono le competenze',
+    skillsCarouselLabel: 'Macroaree di competenza',
+    previousSkill: 'Macroarea precedente',
+    nextSkill: 'Macroarea successiva',
+    skillsDetailsTitle: 'Competenze dell’area',
+    technicalSkillsGroup: 'TECH SKILLS',
+    softSkillsGroup: 'SOFT SKILLS',
+    skillsLanguagesTitle: 'LINGUE',
+    skillsLanguages: ['Italiano madrelingua', 'Inglese C1', 'Svedese A1'],
+    skillsCombinationTitle: 'Esempio concreto',
+    skillsCombinationEmpty: 'Per questa coppia non c’è ancora un esempio da raccontare.',
     skillsItems: [
       { title: 'Cloud e infrastruttura', description: 'Terraform, Helm, AWS, Kubernetes.' },
       { title: 'Sviluppo iOS', description: 'Swift, SwiftUI, UIKit.' },
       { title: 'XR, VR & Computer Vision', description: 'Unity, C#, XR Development.' },
       { title: 'Delivery', description: 'Agile, DevOps, Git, GitLab CI/CD.' },
-      { title: 'Collaborazione', description: 'Adattabilità, team player, feedback-driven, people-oriented.' },
-      { title: 'Lingue', description: 'Italiano madrelingua, inglese C1, svedese A1.' },
+      { title: 'Adattabilità', description: 'Adattabilità.' },
+      { title: 'Spirito di squadra', description: 'Spirito di squadra.' },
+      { title: 'Apertura al feedback', description: 'Apertura al feedback.' },
+      { title: 'Attenzione alle persone', description: 'Attenzione alle persone.' },
     ],
+    skillCombinationDescriptions: {
+      '2:0': {
+        label: 'TIROCINIO XR · TIM',
+        description: 'Ho portato un’app da mobile e HoloLens a Quest Pro e Quest 3, adattando interfaccia, interazioni e gestione dei contenuti ai nuovi dispositivi.',
+      },
+      '3:1': {
+        label: 'INY EYES · XRCC 2025',
+        description: 'Ho guidato team e sviluppo end-to-end: dalla strategia di prodotto e roadmap al design delle interazioni e al prototipo pronto all’uso.',
+      },
+      '1:3': {
+        label: 'APP EVENTI · REPLY',
+        description: 'Ho sviluppato e mantenuto un’app iOS per eventi usata da migliaia di persone, con notifiche in tempo reale, validazione QR e sincronizzazione in background.',
+      },
+    },
     contactKicker: '04 / CONTATTI',
     contactTitle: 'Contatti',
     contactDescription: 'Per opportunità e collaborazioni, scrivimi:',
@@ -162,6 +210,9 @@ const translations = {
     projectsNavigation: 'Projects',
     skillsNavigation: 'Skills',
     contactNavigation: 'Contact',
+    skillsViewsLabel: 'Skills view',
+    skillsListView: 'List',
+    skillsFusionView: 'Why?',
     portraitAlt: 'Space for a personal portrait',
     portraitCaption: 'Your photo',
     portraitIndex: 'PORTRAIT / 01',
@@ -239,14 +290,41 @@ const translations = {
     secondProjectDescription: 'An XR insurance workflow app using Gaussian Splatting for 3D scene reconstruction, selected for showcase at XR Creator Con 2026.',
     skillsKicker: '03 / SKILLS',
     skillsTitle: 'Skills',
+    skillsFusionTitle: 'How the skills contribute',
+    skillsCarouselLabel: 'Skill areas',
+    previousSkill: 'Previous skill area',
+    nextSkill: 'Next skill area',
+    skillsDetailsTitle: 'Area skills',
+    technicalSkillsGroup: 'TECH SKILLS',
+    softSkillsGroup: 'SOFT SKILLS',
+    skillsLanguagesTitle: 'LANGUAGES',
+    skillsLanguages: ['Native Italian', 'English C1', 'Swedish A1'],
+    skillsCombinationTitle: 'A real example',
+    skillsCombinationEmpty: 'There is no example to share for this pairing yet.',
     skillsItems: [
       { title: 'Cloud & infrastructure', description: 'Terraform, Helm, AWS, Kubernetes.' },
       { title: 'iOS development', description: 'Swift, SwiftUI, UIKit.' },
       { title: 'XR, VR & Computer Vision', description: 'Unity, C#, XR development.' },
       { title: 'Delivery', description: 'Agile, DevOps, Git, GitLab CI/CD.' },
-      { title: 'Collaboration', description: 'Adaptability, team player, feedback-driven, people-oriented.' },
-      { title: 'Languages', description: 'Native Italian, English C1, Swedish A1.' },
+      { title: 'Adaptability', description: 'Adaptability.' },
+      { title: 'Teamwork', description: 'Teamwork.' },
+      { title: 'Feedback-driven', description: 'Feedback-driven.' },
+      { title: 'People-oriented', description: 'People-oriented.' },
     ],
+    skillCombinationDescriptions: {
+      '2:0': {
+        label: 'XR INTERNSHIP · TIM',
+        description: 'I ported an app from mobile and HoloLens to Quest Pro and Quest 3, adapting its interface, interactions, and content management for the new devices.',
+      },
+      '3:1': {
+        label: 'INYOUR EYES · XRCC 2025',
+        description: 'I led the team and end-to-end development, from product strategy and roadmap to interaction design and a ready-to-use prototype.',
+      },
+      '1:3': {
+        label: 'EVENT APP · REPLY',
+        description: 'I developed and maintained an iOS event app used by thousands, with real-time notifications, QR validation, and background synchronization.',
+      },
+    },
     contactKicker: '04 / CONTACT',
     contactTitle: 'Contact',
     contactDescription: 'For opportunities and collaborations, get in touch:',
@@ -372,6 +450,9 @@ function ProfileSocials({
 
 function App() {
   const [progress, setProgress] = useState(0)
+  const [skillsView, setSkillsView] = useState<'inventory' | 'fusion'>('inventory')
+  const [selectedSkillIndices, setSelectedSkillIndices] = useState([2, 0])
+  const [skillWheelRotations, setSkillWheelRotations] = useState([-180, 0])
   const [language, setLanguage] = useState<Language>(() => (
     window.localStorage.getItem('portfolio-language') === 'en' ? 'en' : 'it'
   ))
@@ -385,6 +466,10 @@ function App() {
   const aboutPageHeading = useRef<HTMLHeadingElement>(null)
   const previousAboutPageOpen = useRef(false)
   const copy = translations[language]
+  const skillGroups = [
+    { title: copy.technicalSkillsGroup, skills: copy.skillsItems.slice(0, 4), iconOffset: 0 },
+    { title: copy.softSkillsGroup, skills: copy.skillsItems.slice(4, 8), iconOffset: 4 },
+  ]
 
   useEffect(() => {
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
@@ -530,6 +615,23 @@ function App() {
     setResumeRequestOpen(false)
   }
 
+  const selectSkill = (groupIndex: number, index: number, direction?: -1 | 1) => {
+    const group = skillGroups[groupIndex] ?? skillGroups[0]
+    const skillCount = group.skills.length
+    const nextIndex = (index + skillCount) % skillCount
+    const previousIndex = selectedSkillIndices[groupIndex] ?? 0
+    const delta = nextIndex - previousIndex
+    const shortestDelta = ((delta + skillCount / 2 + skillCount) % skillCount) - skillCount / 2
+    const rotationStep = nextIndex === previousIndex ? 0 : direction ?? shortestDelta
+
+    setSkillWheelRotations((rotations) => rotations.map((rotation, currentGroupIndex) => (
+      currentGroupIndex === groupIndex ? rotation - rotationStep * 360 / skillCount : rotation
+    )))
+    setSelectedSkillIndices((indices) => indices.map((selectedIndex, currentGroupIndex) => (
+      currentGroupIndex === groupIndex ? nextIndex : selectedIndex
+    )))
+  }
+
   const curtainProgress = progress * progress * (3 - 2 * progress)
   const revealVisibility = Math.min(curtainProgress * 1.35, 1)
   const projectCards = [
@@ -548,6 +650,12 @@ function App() {
       description: copy.secondProjectDescription,
     },
   ]
+  const technicalSkillIndex = selectedSkillIndices[0] ?? 0
+  const softSkillIndex = selectedSkillIndices[1] ?? 0
+  const technicalSkill = skillGroups[0].skills[technicalSkillIndex] ?? copy.skillsItems[0]
+  const softSkill = skillGroups[1].skills[softSkillIndex] ?? copy.skillsItems[4]
+  const combinationKey = `${technicalSkillIndex}:${softSkillIndex}` as keyof typeof copy.skillCombinationDescriptions
+  const combinationExample = copy.skillCombinationDescriptions[combinationKey]
 
   return (
     <main className="landing">
@@ -914,16 +1022,297 @@ function App() {
             <p className="section-kicker">{copy.skillsKicker}</p>
             <h2 id="skills-title">{copy.skillsTitle}</h2>
           </div>
-          <div className="skills-list">
-            {copy.skillsItems.map((skill, index) => (
-              <article className="skill-item" key={skill.title}>
-                <span className="skill-item-index">{String(index + 1).padStart(2, '0')}</span>
-                <div>
-                  <h3>{skill.title}</h3>
-                  <p>{skill.description}</p>
+          <div className="skills-view-mobile-switch" role="group" aria-label={copy.skillsViewsLabel}>
+            <button
+              className="skills-view-mobile-option skills-view-mobile-option--inventory"
+              type="button"
+              aria-controls="skills-inventory-panel"
+              aria-pressed={skillsView === 'inventory'}
+              onClick={() => setSkillsView('inventory')}
+            >
+              <List size={17} strokeWidth={1.8} aria-hidden="true" />
+              <span>{copy.skillsListView}</span>
+            </button>
+            <button
+              className="skills-view-mobile-option skills-view-mobile-option--fusion"
+              type="button"
+              aria-controls="skills-fusion-panel"
+              aria-pressed={skillsView === 'fusion'}
+              onClick={() => setSkillsView('fusion')}
+            >
+              <MessageCircle size={17} strokeWidth={1.8} aria-hidden="true" />
+              <span>{copy.skillsFusionView}</span>
+            </button>
+          </div>
+          <div className="skills-view-container" data-active-view={skillsView}>
+            <div className="skills-view-pane skills-view-pane--inventory">
+                <div
+                  className="skills-view-panel skills-inventory"
+                  id="skills-inventory-panel"
+                  aria-hidden={skillsView !== 'inventory'}
+                  inert={skillsView !== 'inventory'}
+                >
+            <section className="skills-inventory-group skills-inventory-group--technical" aria-labelledby="skills-technical-title">
+              <h3 id="skills-technical-title">{skillGroups[0].title}</h3>
+              <div className="skills-inventory-domains">
+                {skillGroups[0].skills.map((skill) => (
+                  <div className="skills-inventory-domain" key={skill.title}>
+                    <h4>{skill.title}</h4>
+                    <ul className="skill-tags">
+                      {skill.description.split(',').map((item) => {
+                        const label = item.trim().replace(/\.$/, '')
+                        return <li className="skill-tag" key={label}>{label}</li>
+                      })}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </section>
+            <section className="skills-inventory-group skills-inventory-group--soft" aria-labelledby="skills-soft-title">
+              <h3 id="skills-soft-title">{skillGroups[1].title}</h3>
+              <ul className="skills-simple-list">
+                {skillGroups[1].skills.map((skill) => <li key={skill.title}>{skill.title}</li>)}
+              </ul>
+            </section>
+            <section className="skills-inventory-group skills-inventory-group--languages" aria-labelledby="skills-languages-title">
+              <div className="skills-languages-heading">
+                <Languages size={17} strokeWidth={1.8} aria-hidden="true" />
+                <h3 id="skills-languages-title">{copy.skillsLanguagesTitle}</h3>
+              </div>
+              <ul className="skills-simple-list">
+                {copy.skillsLanguages.map((item) => <li key={item}>{item}</li>)}
+              </ul>
+            </section>
                 </div>
-              </article>
-            ))}
+              <button
+                className="skills-view-trigger skills-view-trigger--inventory"
+                type="button"
+                aria-controls="skills-inventory-panel"
+                aria-label={copy.skillsListView}
+                aria-hidden={skillsView === 'inventory'}
+                tabIndex={skillsView === 'inventory' ? -1 : 0}
+                onClick={() => setSkillsView('inventory')}
+              >
+                <List size={18} strokeWidth={1.8} aria-hidden="true" />
+                <span>{copy.skillsListView}</span>
+                <ArrowRight size={16} strokeWidth={1.8} aria-hidden="true" />
+              </button>
+            </div>
+            <div className="skills-view-pane skills-view-pane--fusion">
+                <div
+                  className="skills-view-panel skills-fusions"
+                  id="skills-fusion-panel"
+                  aria-labelledby="skills-fusion-title"
+                  aria-hidden={skillsView !== 'fusion'}
+                  inert={skillsView !== 'fusion'}
+                >
+            <h3 className="skills-fusions-title" id="skills-fusion-title">{copy.skillsFusionTitle}</h3>
+          <div className="skills-explorer">
+            <div className="skills-gear-display">
+            <div className="skills-gears skills-gears--desktop">
+              {skillGroups.map((group, groupIndex) => {
+                const selectedIndex = selectedSkillIndices[groupIndex] ?? 0
+                const rotation = skillWheelRotations[groupIndex] ?? 0
+                return (
+                  <div
+                    className={`skills-wheel-column ${groupIndex === 0 ? 'skills-wheel-column--technical' : 'skills-wheel-column--soft'}`}
+                    key={group.title}
+                  >
+                    <div
+                      className="skills-orbit"
+                      role="group"
+                      aria-label={`${group.title}: ${copy.skillsCarouselLabel}`}
+                      onKeyDown={(event) => {
+                        if (event.key === 'ArrowLeft') {
+                          event.preventDefault()
+                          selectSkill(groupIndex, selectedIndex - 1, -1)
+                        }
+                        if (event.key === 'ArrowRight') {
+                          event.preventDefault()
+                          selectSkill(groupIndex, selectedIndex + 1, 1)
+                        }
+                      }}
+                    >
+                      <div className="skills-orbit-ring" aria-hidden="true" />
+                      <div className="skills-orbit-nodes" style={{ transform: `rotate(${rotation}deg)` }}>
+                        {group.skills.map((skill, index) => {
+                          const angle = (index / group.skills.length) * Math.PI * 2 - Math.PI / 2
+                          const SkillIcon = skillAreaIcons[group.iconOffset + index]
+                          return (
+                            <button
+                              className="skills-orbit-option"
+                              key={skill.title}
+                              type="button"
+                              title={skill.title}
+                              aria-label={skill.title}
+                              aria-pressed={selectedIndex === index}
+                              aria-controls="skill-detail-panel"
+                              style={{
+                                left: `${50 + Math.cos(angle) * 37}%`,
+                                top: `${50 + Math.sin(angle) * 37}%`,
+                              }}
+                              onClick={() => selectSkill(groupIndex, index)}
+                            >
+                              <span className="skills-orbit-icon" style={{ transform: `rotate(${-rotation}deg)` }}>
+                                <SkillIcon size={21} strokeWidth={1.8} aria-hidden="true" />
+                              </span>
+                            </button>
+                          )
+                        })}
+                      </div>
+                      <div className="skills-orbit-center" aria-hidden="true" />
+                    </div>
+                    <div className="skills-wheel-controls">
+                      <button
+                        className="skills-wheel-arrow"
+                        type="button"
+                        aria-label={copy.previousSkill}
+                        onClick={() => selectSkill(groupIndex, selectedIndex - 1, -1)}
+                      >
+                        <ArrowLeft size={18} strokeWidth={1.8} aria-hidden="true" />
+                      </button>
+                      <span className="skills-wheel-selected-skill" aria-live="polite">{group.skills[selectedIndex]?.title}</span>
+                      <button
+                        className="skills-wheel-arrow"
+                        type="button"
+                        aria-label={copy.nextSkill}
+                        onClick={() => selectSkill(groupIndex, selectedIndex + 1, 1)}
+                      >
+                        <ArrowRight size={18} strokeWidth={1.8} aria-hidden="true" />
+                      </button>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+            <div className="skills-wheel-column skills-wheel-column--mobile">
+              <div className="skills-mobile-gears">
+                {skillGroups.map((group, groupIndex) => {
+                  const selectedIndex = selectedSkillIndices[groupIndex] ?? 0
+                  const rotation = skillWheelRotations[groupIndex] ?? 0
+                  const isSoftGroup = groupIndex === 1
+                  return (
+                    <div
+                      className={`skills-mobile-wheel ${groupIndex === 0 ? 'skills-wheel-column--technical' : 'skills-wheel-column--soft'}`}
+                      key={group.title}
+                      role="group"
+                      aria-label={`${group.title}: ${copy.skillsCarouselLabel}`}
+                      onKeyDown={(event) => {
+                        if (event.key === 'ArrowLeft') {
+                          event.preventDefault()
+                          selectSkill(groupIndex, selectedIndex - 1, -1)
+                        }
+                        if (event.key === 'ArrowRight') {
+                          event.preventDefault()
+                          selectSkill(groupIndex, selectedIndex + 1, 1)
+                        }
+                      }}
+                    >
+                      <div className={`skills-orbit-ring${isSoftGroup ? ' skills-orbit-ring--inner' : ''}`} aria-hidden="true" />
+                      <div className="skills-orbit-nodes" style={{ transform: `rotate(${rotation}deg)` }}>
+                        {group.skills.map((skill, index) => {
+                          const angle = (index / group.skills.length) * Math.PI * 2 - Math.PI / 2
+                          const SkillIcon = skillAreaIcons[group.iconOffset + index]
+                          const orbitRadius = isSoftGroup ? 22 : 43
+                          return (
+                            <button
+                              className="skills-orbit-option"
+                              key={skill.title}
+                              type="button"
+                              title={skill.title}
+                              aria-label={skill.title}
+                              aria-pressed={selectedIndex === index}
+                              aria-controls="skill-detail-panel"
+                              style={{
+                                left: `${50 + Math.cos(angle) * orbitRadius}%`,
+                                top: `${50 + Math.sin(angle) * orbitRadius}%`,
+                              }}
+                              onClick={() => selectSkill(groupIndex, index)}
+                            >
+                              <span className="skills-orbit-icon" style={{ transform: `rotate(${-rotation}deg)` }}>
+                                <SkillIcon size={21} strokeWidth={1.8} aria-hidden="true" />
+                              </span>
+                            </button>
+                          )
+                        })}
+                      </div>
+                      {isSoftGroup && <div className="skills-orbit-center skills-orbit-center--soft" aria-hidden="true" />}
+                    </div>
+                  )
+                })}
+              </div>
+              <div className="skills-mobile-controls">
+                {skillGroups.map((group, groupIndex) => {
+                  const selectedIndex = selectedSkillIndices[groupIndex] ?? 0
+                  return (
+                    <div className="skills-mobile-control-group" key={group.title}>
+                      <span>{group.title}</span>
+                      <div className="skills-wheel-controls">
+                        <button
+                          className="skills-wheel-arrow"
+                          type="button"
+                          aria-label={`${group.title}: ${copy.previousSkill}`}
+                          onClick={() => selectSkill(groupIndex, selectedIndex - 1, -1)}
+                        >
+                          <ArrowLeft size={18} strokeWidth={1.8} aria-hidden="true" />
+                        </button>
+                        <span className="skills-wheel-selected-skill" aria-live="polite">{group.skills[selectedIndex]?.title}</span>
+                        <button
+                          className="skills-wheel-arrow"
+                          type="button"
+                          aria-label={`${group.title}: ${copy.nextSkill}`}
+                          onClick={() => selectSkill(groupIndex, selectedIndex + 1, 1)}
+                        >
+                          <ArrowRight size={18} strokeWidth={1.8} aria-hidden="true" />
+                        </button>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+            </div>
+            <article className="skill-combination" id="skill-detail-panel" aria-live="polite">
+              <div className="skill-combination-area skill-combination-area--technical">
+                <span>{skillGroups[0].title}</span>
+                <ul className="skill-tags">
+                  {technicalSkill.description.split(',').map((item) => {
+                    const label = item.trim().replace(/\.$/, '')
+                    return <li className="skill-tag" key={label}>{label}</li>
+                  })}
+                </ul>
+              </div>
+              <div className="skill-combination-copy">
+                <h3>{copy.skillsCombinationTitle}</h3>
+                {combinationExample && <span className="skill-combination-source">{combinationExample.label}</span>}
+                <p>{combinationExample?.description ?? copy.skillsCombinationEmpty}</p>
+              </div>
+              <div className="skill-combination-area skill-combination-area--soft">
+                <span>{skillGroups[1].title}</span>
+                <ul className="skill-tags">
+                  {softSkill.description.split(',').map((item) => {
+                    const label = item.trim().replace(/\.$/, '')
+                    return <li className="skill-tag" key={label}>{label}</li>
+                  })}
+                </ul>
+              </div>
+            </article>
+            </div>
+            </div>
+              <button
+                className="skills-view-trigger skills-view-trigger--fusion"
+                type="button"
+                aria-controls="skills-fusion-panel"
+                aria-label={copy.skillsFusionView}
+                aria-hidden={skillsView === 'fusion'}
+                tabIndex={skillsView === 'fusion' ? -1 : 0}
+                onClick={() => setSkillsView('fusion')}
+              >
+                <MessageCircle size={18} strokeWidth={1.8} aria-hidden="true" />
+                <span>{copy.skillsFusionView}</span>
+                <ArrowLeft size={16} strokeWidth={1.8} aria-hidden="true" />
+              </button>
+            </div>
           </div>
         </div>
       </section>
