@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type FormEvent } from 'react'
+import { useEffect, useRef, useState, type FormEvent, type PointerEvent as ReactPointerEvent } from 'react'
 import { faGithub, faLinkedin } from '@fortawesome/free-brands-svg-icons'
 import { faEnvelope, faFileLines } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -15,8 +15,10 @@ import {
   Puzzle,
   RefreshCw,
   Smartphone,
+  UserRoundCog,
   Users,
   X,
+  Briefcase,
 } from 'lucide-react'
 import './App.css'
 
@@ -34,7 +36,7 @@ const socialProfiles = [
   { name: 'resume', url: '/curriculum.pdf', icon: faFileLines },
 ]
 
-const skillAreaIcons = [Cloud, Smartphone, Eye, GitBranch, RefreshCw, Users, MessageCircle, Puzzle] as const
+const skillAreaIcons = [Cloud, Smartphone, Eye, GitBranch, RefreshCw, Users, MessageCircle, Puzzle, UserRoundCog] as const
 
 const translations = {
   it: {
@@ -140,9 +142,27 @@ const translations = {
     secondProjectLabel: 'Finalista XRCC 2026',
     secondProjectTitle: 'ClaimCam',
     secondProjectDescription: 'App XR per workflow assicurativi con ricostruzione 3D della scena tramite Gaussian Splatting, selezionata per XR Creator Con 2026.',
+    thirdProjectLabel: '.NET MAUI / Blazor',
+    thirdProjectTitle: 'BudgetBuddy',
+    thirdProjectDescription: 'Web app per pianificare e tenere sotto controllo il budget mensile e annuale.',
+    fourthProjectLabel: 'XR / Unity',
+    fourthProjectTitle: 'UI Centering',
+    fourthProjectDescription: 'Piccolo esperimento XR con un’interfaccia che si ricentra automaticamente nel campo visivo dell’utente.',
+    fifthProjectLabel: 'Esercitazione / C#',
+    fifthProjectTitle: 'LeetCode',
+    fifthProjectDescription: 'Raccolta delle mie soluzioni ai problemi di LeetCode, per allenare algoritmi e strutture dati. Tutte le soluzioni sono scritte da me, senza l’uso dell’AI.',
+    projectRepoLinkLabel: 'Vedi su GitHub',
+    previousProjects: 'Progetti precedenti',
+    nextProjects: 'Progetti successivi',
+    projectPageLabel: 'Pagina progetti',
+    workProjectsNoteLabel: 'OLTRE I PROGETTI SELEZIONATI',
+    workProjectsNoteTitle: 'Esperienza professionale',
+    workProjectsNote: 'Per riservatezza non posso elencare qui i progetti lavorativi, ma sarò felice di parlarne di persona se ti interessa.',
+    workProjectsNoteAction: 'Parliamone',
     skillsKicker: '03 / COMPETENZE',
     skillsTitle: 'Le mie competenze',
     skillsFusionTitle: 'Come contribuiscono le competenze',
+    skillsFusionDescription: 'Scegli una competenza per ciascuna area e osserva nell’esempio come si combinano.',
     skillsCarouselLabel: 'Macroaree di competenza',
     previousSkill: 'Macroarea precedente',
     nextSkill: 'Macroarea successiva',
@@ -159,29 +179,99 @@ const translations = {
       'Algoritmi e strutture dati',
     ],
     skillsCombinationTitle: 'Esempio concreto',
+    skillsCombinationSource: 'Esempio tratto da',
     skillsCombinationEmpty: 'Per questa coppia non c’è ancora un esempio da raccontare.',
     skillsItems: [
       { title: 'Cloud e infrastruttura', description: 'Terraform & AWS, Helm & Kubernetes.' },
       { title: 'Sviluppo iOS', description: 'Swift, SwiftUI & UIKit.' },
       { title: 'XR, VR & Computer Vision', description: 'Unity & C#, XR Development.' },
       { title: 'Delivery', description: 'DevOps, Git & GitLab CI/CD.' },
-      { title: 'Adattabilità', description: 'Adattabilità.' },
-      { title: 'Spirito di squadra', description: 'Spirito di squadra.' },
-      { title: 'Apertura al feedback', description: 'Apertura al feedback.' },
-      { title: 'Problem solving', description: 'Problem solving.' },
+      { title: 'Adattabilità', description: 'Imparare in fretta, Cambiare contesto' },
+      { title: 'Spirito di squadra', description: 'Collaborazione, Coordinamento tra team' },
+      { title: 'Apertura al feedback', description: 'Ascolto attivo, Miglioramento continuo' },
+      { title: 'Problem solving', description: 'Analisi, Soluzioni pragmatiche' },
+      { title: 'Leadership e ownership', description: 'Iniziativa, Responsabilità' },
     ],
     skillCombinationDescriptions: {
-      '2:0': {
-        label: 'TIROCINIO XR · TIM',
-        description: 'Ho portato un’app da mobile e HoloLens a Quest Pro e Quest 3, adattando interfaccia, interazioni e gestione dei contenuti ai nuovi dispositivi.',
+      '0:0': {
+        label: 'INFRASTRUTTURA B2B / REPLY',
+        description: 'Appena entrato nel progetto ho dovuto coprire fronti molto diversi: dall’abilitare Keycloak e configurarne accessi e permessi alla definizione con Terraform delle risorse AWS necessarie ai servizi.',
       },
-      '3:1': {
-        label: 'INY EYES · XRCC 2025',
-        description: 'Ho guidato team e sviluppo end-to-end: dalla strategia di prodotto e roadmap al design delle interazioni e al prototipo pronto all’uso.',
+      '0:1': {
+        label: 'INFRASTRUTTURA B2B / REPLY',
+        description: 'Mantenere l’infrastruttura significa confrontarsi e coordinarsi di continuo con gli sviluppatori dei microservizi: ogni modifica a risorse, permessi o deploy va concordata, perché ha effetti diretti sul loro lavoro e viceversa.',
+      },
+      '0:2': {
+        label: 'OSSERVABILITÀ / REPLY',
+        description: 'Ho costruito le dashboard Grafana su un flusso costante di feedback con gli sviluppatori, partendo dalle reali necessità di monitoraggio di ciascun microservizio e affinando log, metriche e tracing man mano che emergevano nuove esigenze.',
+      },
+      '0:3': {
+        label: 'STREAMING MEDIAMTX / REPLY',
+        description: 'Certificati TLS installati a mano sulle EC2 di streaming, senza i permessi per gestirli, causavano problemi ricorrenti: ho ridisegnato l’infrastruttura come codice con Terraform, bilanciando i costi di nuovi componenti come i Network Load Balancer con una migrazione senza interruzioni di servizio né perdita di configurazioni e dati.',
+      },
+      '0:4': {
+        label: 'AMBIENTE DEMO / REPLY',
+        description: 'Ho preso in mano la creazione di un ambiente demo parallelo a dev sullo stesso cluster: dopo un kick-off iniziale ho lavorato su ciascun microservizio, collaborando con chi lo sviluppava, finché il deploy su demo non è stato funzionante, indipendente e completo.',
+      },
+      '1:0': {
+        label: 'DA VISIONOS A IOS / REPLY',
+        description: 'Per esigenze aziendali sono passato da sviluppatore XR su visionOS a sviluppatore mobile iOS nel giro di una settimana, facendo leva sulla mia esperienza con SwiftUI per diventare subito operativo su un’app già in produzione.',
+      },
+      '1:1': {
+        label: 'APP EVENTI / REPLY',
+        description: 'Le app iOS e Android dovevano apparire e comportarsi in modo praticamente identico, mentre la parte web dipendeva interamente dalla comunicazione con il nativo: la collaborazione costante con i colleghi ci ha permesso di consegnare un’app che ha soddisfatto pienamente il cliente, nonostante scadenze strettissime.',
+      },
+      '1:2': {
+        label: 'APP EVENTI / REPLY',
+        description: 'Con un cliente molto esigente e requisiti che cambiavano spesso, ho imparato ad accogliere il feedback anche quando significava rifare da zero funzionalità già concluse, mantenendo qualità e scadenze senza perdere la motivazione.',
       },
       '1:3': {
-        label: 'APP EVENTI · REPLY',
-        description: 'Ho sviluppato e mantenuto un’app iOS per eventi usata da migliaia di persone, con notifiche in tempo reale, validazione QR e sincronizzazione in background.',
+        label: 'APP EVENTI / REPLY',
+        description: 'Ho costruito da zero una pipeline con Swift Combine per recuperare, elaborare e aggiornare oltre 6.000 record in cicli di circa 30 secondi, mantenendoli coerenti tra i dispositivi. Un approccio simile su macOS ha decuplicato le prestazioni.',
+      },
+      '1:4': {
+        label: 'APP EVENTI / REPLY',
+        description: 'In assenza di indicazioni chiare ho dato all’app iOS la direzione che mi sembrava più logica per non bloccare gli sviluppi, assumendomene poi la responsabilità davanti al manager e spiegando le scelte fatte.',
+      },
+      '2:0': {
+        label: 'MULTI-DEVICE / XR',
+        description: 'Ho sviluppato per dispositivi molto diversi tra loro, da Meta Quest e Apple Vision Pro a HoloLens e smartphone per la realtà aumentata, adattando ogni volta interazioni, prestazioni e vincoli tecnici alla piattaforma.',
+      },
+      '2:1': {
+        label: 'ESPERIENZE VR / REPLY',
+        description: 'Nelle esperienze VR a cui ho lavorato, il coordinamento con altri sviluppatori su feature diverse, con i 3D artist e con i VFX artist è stato fondamentale per integrare il lavoro di tutti e portare i progetti a termine con successo.',
+      },
+      '2:2': {
+        label: 'INYOUREYES / XRCC 2025',
+        description: 'In InYourEyes ho costruito le interazioni partendo dai feedback del UI designer: unendo la mia esperienza in XR alle sue intuizioni da esperto di UI/UX, abbiamo reso l’esperienza più chiara e naturale da usare dentro il visore.',
+      },
+      '2:3': {
+        label: 'TIROCINIO XR / TIM',
+        description: 'I modelli 3D avevano trasformazioni non normalizzate e generavano collider sproporzionati o troppo pesanti per il visore: ho scritto un algoritmo depth-first che calcola una bounding box minima per ogni elemento e le unisce in un collider approssimato, facile da usare e leggero da calcolare.',
+      },
+      '2:4': {
+        label: 'INYOUREYES / HACKATHON',
+        description: 'Negli hackathon mi pongo come punto di riferimento tecnico del team, anche su ambiti in cui non sono pienamente formato. Con InYourEyes ho guidato il progetto senza esperienza da PM, arrivando al secondo posto.',
+      },
+      '3:0': {
+        label: 'PIPELINE CI/CD / REPLY',
+        description: 'Ho lavorato su molte pipeline diverse, adattandone ambienti, variabili e flussi alle esigenze dei singoli microservizi, così che ognuno potesse essere testato e rilasciato in modo coerente con il resto dell’infrastruttura.',
+      },
+      '3:1': {
+        label: 'PIPELINE CI/CD / REPLY',
+        description: 'Mantengo pipeline chiare e documentate, così che anche i colleghi che sviluppano i microservizi possano capire e gestire in autonomia i propri rilasci, senza dipendere ogni volta da chi segue l’infrastruttura.',
+      },
+      '3:2': {
+        label: 'CODE REVIEW / REPLY',
+        description: 'Le merge request sono un momento di confronto: accolgo i commenti dei colleghi come occasione per migliorare il codice e cerco di restituire review chiare e costruttive, spiegando il perché di ogni suggerimento.',
+      },
+      '3:3': {
+        label: 'PIPELINE CI/CD / REPLY',
+        description: 'Quando una pipeline si blocca, analizzo log e configurazione passo per passo per isolare la causa, che sia una variabile mancante, un permesso o una dipendenza, e sbloccare il rilascio senza scorciatoie rischiose.',
+      },
+      '3:4': {
+        label: 'PIPELINE TERRAFORM / REPLY',
+        description: 'Ho modificato di mia iniziativa le pipeline delle merge request per evitare deploy inutili e ottenere solo piani Terraform reali, così da poter rivedere e riadattare il codice senza deploy rischiosi sugli ambienti condivisi.',
       },
     },
     contactKicker: '04 / CONTATTI',
@@ -294,9 +384,27 @@ const translations = {
     secondProjectLabel: 'XRCC 2026 Finalist',
     secondProjectTitle: 'ClaimCam',
     secondProjectDescription: 'An XR insurance workflow app using Gaussian Splatting for 3D scene reconstruction, selected for showcase at XR Creator Con 2026.',
+    thirdProjectLabel: '.NET MAUI / Blazor',
+    thirdProjectTitle: 'BudgetBuddy',
+    thirdProjectDescription: 'A web app to plan and keep track of monthly and annual budgets.',
+    fourthProjectLabel: 'XR / Unity',
+    fourthProjectTitle: 'UI Centering',
+    fourthProjectDescription: 'A small XR experiment with an interface that automatically re-centres itself in the user’s field of view.',
+    fifthProjectLabel: 'Practice / C#',
+    fifthProjectTitle: 'LeetCode',
+    fifthProjectDescription: 'A collection of my solutions to LeetCode problems, used to practise algorithms and data structures. Every solution is written by me, without the use of AI.',
+    projectRepoLinkLabel: 'View on GitHub',
+    previousProjects: 'Previous projects',
+    nextProjects: 'Next projects',
+    projectPageLabel: 'Projects page',
+    workProjectsNoteLabel: 'BEYOND THE SELECTED PROJECTS',
+    workProjectsNoteTitle: 'Professional experience',
+    workProjectsNote: 'I can’t list my work projects here for confidentiality reasons, but I’d be happy to discuss them in person.',
+    workProjectsNoteAction: 'Let’s talk',
     skillsKicker: '03 / SKILLS',
     skillsTitle: 'Skills',
     skillsFusionTitle: 'How the skills contribute',
+    skillsFusionDescription: 'Choose one skill from each area to see how they work together in the example.',
     skillsCarouselLabel: 'Skill areas',
     previousSkill: 'Previous skill area',
     nextSkill: 'Next skill area',
@@ -313,29 +421,99 @@ const translations = {
       'Algorithms & data structures',
     ],
     skillsCombinationTitle: 'A real example',
+    skillsCombinationSource: 'Example from',
     skillsCombinationEmpty: 'There is no example to share for this pairing yet.',
     skillsItems: [
       { title: 'Cloud & infrastructure', description: 'Terraform & AWS, Helm & Kubernetes.' },
       { title: 'iOS development', description: 'Swift, SwiftUI & UIKit.' },
       { title: 'XR, VR & Computer Vision', description: 'Unity & C#, XR development.' },
       { title: 'Delivery', description: 'DevOps, Git & GitLab CI/CD.' },
-      { title: 'Adaptability', description: 'Adaptability.' },
-      { title: 'Teamwork', description: 'Teamwork.' },
-      { title: 'Feedback-driven', description: 'Feedback-driven.' },
-      { title: 'Problem solving', description: 'Problem solving.' },
+      { title: 'Adaptability', description: 'Fast learning, Context switching' },
+      { title: 'Teamwork', description: 'Collaboration, Cross-team coordination' },
+      { title: 'Feedback-driven', description: 'Active listening, Continuous improvement' },
+      { title: 'Problem solving', description: 'Analysis, Pragmatic solutions' },
+      { title: 'Leadership & ownership', description: 'Initiative, Accountability' },
     ],
     skillCombinationDescriptions: {
-      '2:0': {
-        label: 'XR INTERNSHIP · TIM',
-        description: 'I ported an app from mobile and HoloLens to Quest Pro and Quest 3, adapting its interface, interactions, and content management for the new devices.',
+      '0:0': {
+        label: 'B2B INFRASTRUCTURE / REPLY',
+        description: 'As soon as I joined the project, I had to cover very different fronts: from enabling Keycloak and configuring its access and permissions to defining the AWS resources the services needed with Terraform.',
       },
-      '3:1': {
-        label: 'INYOUR EYES · XRCC 2025',
-        description: 'I led the team and end-to-end development, from product strategy and roadmap to interaction design and a ready-to-use prototype.',
+      '0:1': {
+        label: 'B2B INFRASTRUCTURE / REPLY',
+        description: 'Maintaining the infrastructure means constant discussion and coordination with the microservice developers: every change to resources, permissions, or deployments has to be agreed on, because it directly affects their work and vice versa.',
+      },
+      '0:2': {
+        label: 'OBSERVABILITY / REPLY',
+        description: 'I built the Grafana dashboards around a continuous feedback loop with the developers, starting from the real monitoring needs of each microservice and refining logs, metrics, and tracing as new needs emerged.',
+      },
+      '0:3': {
+        label: 'MEDIAMTX STREAMING / REPLY',
+        description: 'TLS certificates installed by hand on the streaming EC2 instances, without the permissions to manage them, kept causing issues: I redesigned the infrastructure as code with Terraform, balancing the cost of new components such as Network Load Balancers with a migration that caused no downtime and lost no configuration or data.',
+      },
+      '0:4': {
+        label: 'DEMO ENVIRONMENT / REPLY',
+        description: 'I took charge of creating a demo environment alongside dev on the same cluster: after an initial kick-off, I worked through each microservice with its developers until the demo deployment was functional, independent, and complete.',
+      },
+      '1:0': {
+        label: 'FROM VISIONOS TO IOS / REPLY',
+        description: 'Due to business needs, I moved from visionOS XR developer to iOS mobile developer within a week, building on my SwiftUI experience to become productive right away on an app already in production.',
+      },
+      '1:1': {
+        label: 'EVENT APP / REPLY',
+        description: 'The iOS and Android apps had to look and behave almost identically, while the web part depended entirely on communication with the native layer: constant collaboration with my colleagues let us deliver an app that fully satisfied the client despite very tight deadlines.',
+      },
+      '1:2': {
+        label: 'EVENT APP / REPLY',
+        description: 'With a very demanding client and frequently changing requirements, I learned to embrace feedback even when it meant rebuilding finished features from scratch, while keeping quality and deadlines on track.',
       },
       '1:3': {
-        label: 'EVENT APP · REPLY',
-        description: 'I developed and maintained an iOS event app used by thousands, with real-time notifications, QR validation, and background synchronization.',
+        label: 'EVENT APP / REPLY',
+        description: 'I built a Swift Combine pipeline from scratch to fetch, process, and update 6,000+ records in cycles of about 30 seconds while keeping them consistent across devices. A similar approach on macOS delivered a 10x performance boost.',
+      },
+      '1:4': {
+        label: 'EVENT APP / REPLY',
+        description: 'Without clear direction, I set the course for the iOS app that made the most sense to me so development could move forward, then took responsibility for it in front of my manager and explained the choices I made.',
+      },
+      '2:0': {
+        label: 'MULTI-DEVICE / XR',
+        description: 'I have developed for very different devices, from Meta Quest and Apple Vision Pro to HoloLens and AR on smartphones, adapting interactions, performance, and technical constraints to each platform.',
+      },
+      '2:1': {
+        label: 'VR EXPERIENCES / REPLY',
+        description: 'In the VR experiences I worked on, coordinating with other developers on different features, with 3D artists, and with VFX artists was key to bringing everyone’s work together and delivering the projects successfully.',
+      },
+      '2:2': {
+        label: 'INYOUREYES / XRCC 2025',
+        description: 'In InYourEyes I built the interactions around feedback from the UI designer: by combining my XR expertise with their UI/UX insights, we made the experience clearer and more natural to use inside the headset.',
+      },
+      '2:3': {
+        label: 'XR INTERNSHIP / TIM',
+        description: 'The 3D models had non-normalized transforms that produced oversized colliders or ones too heavy for the headset: I wrote a depth-first algorithm that computes a minimum bounding box for each element and merges them into an approximate collider that is easy to interact with and cheap to compute.',
+      },
+      '2:4': {
+        label: 'INYOUREYES / HACKATHONS',
+        description: 'At hackathons I act as the team’s technical point of reference, even in areas where I am not fully trained. With InYourEyes I led the project with no PM experience and reached second place.',
+      },
+      '3:0': {
+        label: 'CI/CD PIPELINES / REPLY',
+        description: 'I have worked on many different pipelines, adapting their environments, variables, and flows to the needs of each microservice so every one of them could be tested and released consistently with the rest of the infrastructure.',
+      },
+      '3:1': {
+        label: 'CI/CD PIPELINES / REPLY',
+        description: 'I keep pipelines clear and documented so that the developers of each microservice can understand and manage their own releases independently, without always depending on whoever looks after the infrastructure.',
+      },
+      '3:2': {
+        label: 'CODE REVIEW / REPLY',
+        description: 'Merge requests are a moment for discussion: I welcome colleagues’ comments as a chance to improve the code and aim to give clear, constructive reviews in return, explaining the reasoning behind each suggestion.',
+      },
+      '3:3': {
+        label: 'CI/CD PIPELINES / REPLY',
+        description: 'When a pipeline gets stuck, I go through logs and configuration step by step to isolate the cause, whether it is a missing variable, a permission, or a dependency, and unblock the release without risky shortcuts.',
+      },
+      '3:4': {
+        label: 'TERRAFORM PIPELINES / REPLY',
+        description: 'On my own initiative, I changed the merge request pipelines to avoid unnecessary deployments and produce only real Terraform plans, so code could be reviewed and reworked without risky deploys on shared environments.',
       },
     },
     contactKicker: '04 / CONTACT',
@@ -463,9 +641,23 @@ function ProfileSocials({
 
 function App() {
   const [progress, setProgress] = useState(0)
+  const [projectPage, setProjectPage] = useState(0)
   const [skillsView, setSkillsView] = useState<'inventory' | 'fusion'>('inventory')
   const [selectedSkillIndices, setSelectedSkillIndices] = useState([2, 0])
   const [skillWheelRotations, setSkillWheelRotations] = useState([-180, 0])
+  const [draggingSkillWheel, setDraggingSkillWheel] = useState<number | null>(null)
+  const wheelDrag = useRef<{
+    groupIndex: number
+    pointerId: number
+    lastAngle: number
+    lastTimestamp: number
+    accumulatedAngle: number
+    angularVelocity: number
+    rotation: number
+    selectedIndex: number
+    hasDragged: boolean
+  } | null>(null)
+  const suppressWheelClick = useRef(false)
   const [language, setLanguage] = useState<Language>(() => (
     window.localStorage.getItem('portfolio-language') === 'en' ? 'en' : 'it'
   ))
@@ -481,7 +673,7 @@ function App() {
   const copy = translations[language]
   const skillGroups = [
     { title: copy.technicalSkillsGroup, skills: copy.skillsItems.slice(0, 4), iconOffset: 0 },
-    { title: copy.softSkillsGroup, skills: copy.skillsItems.slice(4, 8), iconOffset: 4 },
+    { title: copy.softSkillsGroup, skills: copy.skillsItems.slice(4), iconOffset: 4 },
   ]
 
   useEffect(() => {
@@ -628,6 +820,12 @@ function App() {
     setResumeRequestOpen(false)
   }
 
+  const setSelectedSkillIndex = (groupIndex: number, index: number) => {
+    setSelectedSkillIndices((indices) => indices.map((selectedIndex, currentGroupIndex) => (
+      currentGroupIndex === groupIndex ? index : selectedIndex
+    )))
+  }
+
   const selectSkill = (groupIndex: number, index: number, direction?: -1 | 1) => {
     const group = skillGroups[groupIndex] ?? skillGroups[0]
     const skillCount = group.skills.length
@@ -640,9 +838,101 @@ function App() {
     setSkillWheelRotations((rotations) => rotations.map((rotation, currentGroupIndex) => (
       currentGroupIndex === groupIndex ? rotation - rotationStep * 360 / skillCount : rotation
     )))
-    setSelectedSkillIndices((indices) => indices.map((selectedIndex, currentGroupIndex) => (
-      currentGroupIndex === groupIndex ? nextIndex : selectedIndex
+    setSelectedSkillIndex(groupIndex, nextIndex)
+  }
+
+  const startSkillWheelDrag = (event: ReactPointerEvent<HTMLDivElement>, groupIndex: number) => {
+    if (!event.isPrimary || event.button !== 0) return
+
+    const bounds = event.currentTarget.getBoundingClientRect()
+    const angle = Math.atan2(
+      event.clientY - bounds.top - bounds.height / 2,
+      event.clientX - bounds.left - bounds.width / 2,
+    ) * 180 / Math.PI
+
+    wheelDrag.current = {
+      groupIndex,
+      pointerId: event.pointerId,
+      lastAngle: angle,
+      lastTimestamp: event.timeStamp,
+      accumulatedAngle: 0,
+      angularVelocity: 0,
+      rotation: skillWheelRotations[groupIndex] ?? 0,
+      selectedIndex: selectedSkillIndices[groupIndex] ?? 0,
+      hasDragged: false,
+    }
+    setDraggingSkillWheel(groupIndex)
+
+    const captureTarget = event.target instanceof Element
+      ? event.target.closest<HTMLElement>('.skills-orbit-option') ?? event.currentTarget
+      : event.currentTarget
+    captureTarget.setPointerCapture(event.pointerId)
+  }
+
+  const moveSkillWheelDrag = (event: ReactPointerEvent<HTMLDivElement>) => {
+    const drag = wheelDrag.current
+    if (!drag || drag.pointerId !== event.pointerId) return
+
+    const bounds = event.currentTarget.getBoundingClientRect()
+    const angle = Math.atan2(
+      event.clientY - bounds.top - bounds.height / 2,
+      event.clientX - bounds.left - bounds.width / 2,
+    ) * 180 / Math.PI
+    let angleDelta = angle - drag.lastAngle
+    if (angleDelta > 180) angleDelta -= 360
+    if (angleDelta < -180) angleDelta += 360
+    const elapsed = Math.max(event.timeStamp - drag.lastTimestamp, 1)
+    drag.angularVelocity = drag.angularVelocity * 0.65 + (angleDelta / elapsed) * 0.35
+    drag.lastAngle = angle
+    drag.lastTimestamp = event.timeStamp
+    drag.accumulatedAngle += angleDelta
+    drag.rotation += angleDelta
+    if (Math.abs(drag.accumulatedAngle) >= 5) drag.hasDragged = true
+    setSkillWheelRotations((rotations) => rotations.map((rotation, groupIndex) => (
+      groupIndex === drag.groupIndex ? drag.rotation : rotation
     )))
+
+    const skillCount = skillGroups[drag.groupIndex]?.skills.length ?? 0
+    if (skillCount === 0) return
+
+    const anglePerSkill = 360 / skillCount
+    while (Math.abs(drag.accumulatedAngle) >= anglePerSkill / 2) {
+      const angularDirection = Math.sign(drag.accumulatedAngle)
+      const skillDirection = angularDirection > 0 ? -1 : 1
+      drag.selectedIndex = (drag.selectedIndex + skillDirection + skillCount) % skillCount
+      setSelectedSkillIndex(drag.groupIndex, drag.selectedIndex)
+      drag.accumulatedAngle -= angularDirection * anglePerSkill
+    }
+  }
+
+  const finishSkillWheelDrag = (event: ReactPointerEvent<HTMLDivElement>) => {
+    const drag = wheelDrag.current
+    if (!drag || drag.pointerId !== event.pointerId) return
+
+    wheelDrag.current = null
+    setDraggingSkillWheel(null)
+    const skillCount = skillGroups[drag.groupIndex]?.skills.length ?? 0
+    if (skillCount > 0) {
+      const anglePerSkill = 360 / skillCount
+      const momentum = drag.hasDragged
+        ? Math.max(-anglePerSkill * 2, Math.min(anglePerSkill * 2, drag.angularVelocity * 140))
+        : 0
+      const projectedAngle = drag.accumulatedAngle + momentum
+      const snappedSteps = Math.round(projectedAngle / anglePerSkill)
+      const remainder = projectedAngle - snappedSteps * anglePerSkill
+      const nextIndex = (drag.selectedIndex - snappedSteps + skillCount * 2) % skillCount
+      setSkillWheelRotations((rotations) => rotations.map((rotation, groupIndex) => (
+        groupIndex === drag.groupIndex ? drag.rotation + momentum - remainder : rotation
+      )))
+      setSelectedSkillIndex(drag.groupIndex, nextIndex)
+    }
+
+    if (drag.hasDragged) {
+      suppressWheelClick.current = true
+      window.setTimeout(() => {
+        suppressWheelClick.current = false
+      }, 0)
+    }
   }
 
   const curtainProgress = progress * progress * (3 - 2 * progress)
@@ -654,6 +944,7 @@ function App() {
       label: copy.featuredProjectLabel,
       title: copy.featuredProjectTitle,
       description: copy.featuredProjectDescription,
+      href: 'https://github.com/DE-R-V/in-your-eyes',
     },
     {
       number: '02',
@@ -661,8 +952,39 @@ function App() {
       label: copy.secondProjectLabel,
       title: copy.secondProjectTitle,
       description: copy.secondProjectDescription,
+      href: 'https://github.com/finley-Sun/ClaimCam',
     },
-  ]
+    {
+      number: '03',
+      style: 'study',
+      label: copy.thirdProjectLabel,
+      title: copy.thirdProjectTitle,
+      description: copy.thirdProjectDescription,
+      href: 'https://github.com/DE-R-V/BudgetBuddy',
+    },
+    {
+      number: '04',
+      style: 'study',
+      label: copy.fourthProjectLabel,
+      title: copy.fourthProjectTitle,
+      description: copy.fourthProjectDescription,
+      href: 'https://github.com/DE-R-V/ui-centering',
+    },
+    {
+      number: '05',
+      style: 'practice',
+      label: copy.fifthProjectLabel,
+      title: copy.fifthProjectTitle,
+      description: copy.fifthProjectDescription,
+      href: 'https://github.com/DE-R-V/LeetCode',
+    },
+  ] as { number: string; style: string; label: string; title: string; description: string; href?: string }[]
+  const projectPageSize = 2
+  const projectPageCount = Math.ceil(projectCards.length / projectPageSize)
+  const visibleProjectCards = projectCards.slice(
+    projectPage * projectPageSize,
+    (projectPage + 1) * projectPageSize,
+  )
   const technicalSkillIndex = selectedSkillIndices[0] ?? 0
   const softSkillIndex = selectedSkillIndices[1] ?? 0
   const technicalSkill = skillGroups[0].skills[technicalSkillIndex] ?? copy.skillsItems[0]
@@ -1001,10 +1323,13 @@ function App() {
             <p className="section-kicker">{copy.projectsKicker}</p>
             <h2>{copy.projectsTitle}</h2>
           </div>
-          <div className="projects-mosaic">
-            {projectCards.map((project) => (
+          <div
+            className={`projects-mosaic${visibleProjectCards.length === 1 ? ' projects-mosaic--single' : ''}`}
+            id="projects-mosaic"
+          >
+            {visibleProjectCards.map((project, index) => (
               <article
-                className={`project-card project-card--${project.style}`}
+                className={`project-card project-card--${project.style} project-card--showcase-${index === 0 ? 'primary' : 'secondary'}`}
                 key={project.number}
               >
                 <div className={`project-art project-art--${project.style}`} aria-hidden="true">
@@ -1019,13 +1344,81 @@ function App() {
                   </div>
                 </div>
                 <div className="project-card-copy">
-                  <p className="project-card-label">{project.label}</p>
+                  <div className="project-card-meta">
+                    <p className="project-card-label">{project.label}</p>
+                    <span>{project.number}<span aria-hidden="true"> / </span>{String(projectCards.length).padStart(2, '0')}</span>
+                  </div>
                   <h3>{project.title}</h3>
                   <p className="project-card-description">{project.description}</p>
+                  {project.href && (
+                    <a
+                      className="project-card-link"
+                      href={project.href}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      {copy.projectRepoLinkLabel} ↗
+                    </a>
+                  )}
                 </div>
               </article>
             ))}
           </div>
+          {projectPageCount > 1 && (
+            <nav className="projects-pagination" aria-label={copy.projectsTitle}>
+              <button
+                className="projects-pagination-button"
+                type="button"
+                aria-label={copy.previousProjects}
+                aria-controls="projects-mosaic"
+                disabled={projectPage === 0}
+                onClick={() => setProjectPage((page) => Math.max(0, page - 1))}
+              >
+                <ArrowLeft size={17} strokeWidth={1.8} aria-hidden="true" />
+                <span>{copy.previousProjects}</span>
+              </button>
+              <div className="projects-page-list" role="group" aria-label={copy.projectPageLabel}>
+                {Array.from({ length: projectPageCount }, (_, pageIndex) => (
+                  <button
+                    className="projects-page-button"
+                    key={pageIndex}
+                    type="button"
+                    aria-label={`${copy.projectPageLabel} ${pageIndex + 1}`}
+                    aria-current={projectPage === pageIndex ? 'page' : undefined}
+                    onClick={() => setProjectPage(pageIndex)}
+                  >
+                    <span>{String(pageIndex + 1).padStart(2, '0')}</span>
+                    <span className="projects-page-progress" aria-hidden="true" />
+                  </button>
+                ))}
+              </div>
+              <button
+                className="projects-pagination-button"
+                type="button"
+                aria-label={copy.nextProjects}
+                aria-controls="projects-mosaic"
+                disabled={projectPage === projectPageCount - 1}
+                onClick={() => setProjectPage((page) => Math.min(projectPageCount - 1, page + 1))}
+              >
+                <span>{copy.nextProjects}</span>
+                <ArrowRight size={17} strokeWidth={1.8} aria-hidden="true" />
+              </button>
+            </nav>
+          )}
+          <aside className="projects-work-note" aria-labelledby="projects-work-note-title">
+            <span className="projects-work-note-icon" aria-hidden="true">
+              <MessageCircle size={22} strokeWidth={1.7} />
+            </span>
+            <div className="projects-work-note-copy">
+              <p>{copy.workProjectsNoteLabel}</p>
+              <h3 id="projects-work-note-title">{copy.workProjectsNoteTitle}</h3>
+              <p>{copy.workProjectsNote}</p>
+            </div>
+            <a className="projects-work-note-link" href="#contatti">
+              {copy.workProjectsNoteAction}
+              <ArrowRight size={17} strokeWidth={1.8} aria-hidden="true" />
+            </a>
+          </aside>
         </div>
       </section>
 
@@ -1123,6 +1516,7 @@ function App() {
                   inert={skillsView !== 'fusion'}
                 >
             <h3 className="skills-fusions-title" id="skills-fusion-title">{copy.skillsFusionTitle}</h3>
+                <p className="skills-fusions-description">{copy.skillsFusionDescription}</p>
           <div className="skills-explorer">
             <div className="skills-gear-display">
             <div className="skills-gears skills-gears--desktop">
@@ -1155,9 +1549,19 @@ function App() {
                       </button>
                     </div>
                     <div
-                      className="skills-orbit"
+                      className={`skills-orbit${draggingSkillWheel === groupIndex ? ' skills-wheel--dragging' : ''}`}
                       role="group"
                       aria-label={`${group.title}: ${copy.skillsCarouselLabel}`}
+                      onPointerDown={(event) => startSkillWheelDrag(event, groupIndex)}
+                      onPointerMove={moveSkillWheelDrag}
+                      onPointerUp={finishSkillWheelDrag}
+                      onPointerCancel={finishSkillWheelDrag}
+                      onClickCapture={(event) => {
+                        if (!suppressWheelClick.current) return
+                        event.preventDefault()
+                        event.stopPropagation()
+                        suppressWheelClick.current = false
+                      }}
                       onKeyDown={(event) => {
                         if (event.key === 'ArrowLeft') {
                           event.preventDefault()
@@ -1196,122 +1600,67 @@ function App() {
                           )
                         })}
                       </div>
-                      <div className="skills-orbit-center" aria-hidden="true" />
+                      <div className="skills-orbit-center" aria-hidden="true">
+                        <span>{group.title}</span>
+                        <h3>{group.skills[selectedIndex]?.title}</h3>
+                      </div>
                     </div>
                   </div>
                 )
               })}
             </div>
-            <div className="skills-wheel-column skills-wheel-column--mobile">
-              <div className="skills-mobile-gears">
+            <div className="skills-mobile-skill-selectors">
                 {skillGroups.map((group, groupIndex) => {
                   const selectedIndex = selectedSkillIndices[groupIndex] ?? 0
-                  const rotation = skillWheelRotations[groupIndex] ?? 0
-                  const isSoftGroup = groupIndex === 1
                   return (
-                    <div
-                      className={`skills-mobile-wheel ${groupIndex === 0 ? 'skills-wheel-column--technical' : 'skills-wheel-column--soft'}`}
+                    <label
+                      className={`skills-mobile-skill-select ${groupIndex === 0 ? 'skills-mobile-skill-select--technical skills-wheel-column--technical' : 'skills-mobile-skill-select--soft skills-wheel-column--soft'}`}
                       key={group.title}
-                      role="group"
-                      aria-label={`${group.title}: ${copy.skillsCarouselLabel}`}
-                      onKeyDown={(event) => {
-                        if (event.key === 'ArrowLeft') {
-                          event.preventDefault()
-                          selectSkill(groupIndex, selectedIndex - 1, -1)
-                        }
-                        if (event.key === 'ArrowRight') {
-                          event.preventDefault()
-                          selectSkill(groupIndex, selectedIndex + 1, 1)
-                        }
-                      }}
                     >
-                      <div className={`skills-orbit-ring${isSoftGroup ? ' skills-orbit-ring--inner' : ''}`} aria-hidden="true" />
-                      <div className="skills-orbit-nodes" style={{ transform: `rotate(${rotation}deg)` }}>
+                      <span>{group.title}</span>
+                      <select
+                        value={selectedIndex}
+                        aria-controls="skill-detail-panel"
+                        onChange={(event) => selectSkill(groupIndex, Number(event.target.value))}
+                      >
                         {group.skills.map((skill, index) => {
-                          const angle = (index / group.skills.length) * Math.PI * 2 - Math.PI / 2
-                          const SkillIcon = skillAreaIcons[group.iconOffset + index]
-                          const orbitRadius = isSoftGroup ? 22 : 43
                           return (
-                            <button
-                              className="skills-orbit-option"
-                              key={skill.title}
-                              type="button"
-                              title={skill.title}
-                              aria-label={skill.title}
-                              aria-pressed={selectedIndex === index}
-                              aria-controls="skill-detail-panel"
-                              style={{
-                                left: `${50 + Math.cos(angle) * orbitRadius}%`,
-                                top: `${50 + Math.sin(angle) * orbitRadius}%`,
-                              }}
-                              onClick={() => selectSkill(groupIndex, index)}
-                            >
-                              <span className="skills-orbit-icon" style={{ transform: `rotate(${-rotation}deg)` }}>
-                                <SkillIcon size={21} strokeWidth={1.8} aria-hidden="true" />
-                              </span>
-                            </button>
+                            <option key={skill.title} value={index}>{skill.title}</option>
                           )
                         })}
-                      </div>
-                      {isSoftGroup && <div className="skills-orbit-center skills-orbit-center--soft" aria-hidden="true" />}
-                    </div>
+                      </select>
+                    </label>
                   )
                 })}
-              </div>
-              <div className="skills-mobile-controls">
-                {skillGroups.map((group, groupIndex) => {
-                  const selectedIndex = selectedSkillIndices[groupIndex] ?? 0
-                  return (
-                    <div className="skills-mobile-control-group" key={group.title}>
-                      <span>{group.title}</span>
-                      <div className="skills-wheel-controls">
-                        <button
-                          className="skills-wheel-arrow"
-                          type="button"
-                          aria-label={`${group.title}: ${copy.previousSkill}`}
-                          onClick={() => selectSkill(groupIndex, selectedIndex - 1, -1)}
-                        >
-                          <ArrowLeft size={18} strokeWidth={1.8} aria-hidden="true" />
-                        </button>
-                        <span className="skills-wheel-selected-skill" aria-live="polite">{group.skills[selectedIndex]?.title}</span>
-                        <button
-                          className="skills-wheel-arrow"
-                          type="button"
-                          aria-label={`${group.title}: ${copy.nextSkill}`}
-                          onClick={() => selectSkill(groupIndex, selectedIndex + 1, 1)}
-                        >
-                          <ArrowRight size={18} strokeWidth={1.8} aria-hidden="true" />
-                        </button>
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
             </div>
             </div>
             <article className="skill-combination" id="skill-detail-panel" aria-live="polite">
-              <div className="skill-combination-area skill-combination-area--technical">
-                <span>{skillGroups[0].title}</span>
-                <ul className="skill-tags">
+              <div className="skill-combination-copy">
+                <h3 className="skill-combination-pair">
+                  <span className="skill-combination-pair--technical">{technicalSkill.title}</span>
+                  <span className="skill-combination-plus" aria-hidden="true">+</span>
+                  <span className="skill-combination-pair--soft">{softSkill.title}</span>
+                </h3>
+                <ul className="skill-tags skill-combination-tags">
                   {technicalSkill.description.split(',').map((item) => {
                     const label = item.trim().replace(/\.$/, '')
                     return <li className="skill-tag" key={label}>{label}</li>
                   })}
                 </ul>
-              </div>
-              <div className="skill-combination-copy">
-                <h3>{copy.skillsCombinationTitle}</h3>
-                {combinationExample && <span className="skill-combination-source">{combinationExample.label}</span>}
-                <p>{combinationExample?.description ?? copy.skillsCombinationEmpty}</p>
-              </div>
-              <div className="skill-combination-area skill-combination-area--soft">
-                <span>{skillGroups[1].title}</span>
-                <ul className="skill-tags">
+                <ul className="skill-tags skill-combination-tags skill-combination-tags--soft">
                   {softSkill.description.split(',').map((item) => {
                     const label = item.trim().replace(/\.$/, '')
                     return <li className="skill-tag" key={label}>{label}</li>
                   })}
                 </ul>
+                {combinationExample && (
+                  <p className="skill-combination-source">
+                    <Briefcase size={14} strokeWidth={1.8} aria-hidden="true" />
+                    <span>{copy.skillsCombinationSource}</span>
+                    <strong>{combinationExample.label}</strong>
+                  </p>
+                )}
+                <p>{combinationExample?.description ?? copy.skillsCombinationEmpty}</p>
               </div>
             </article>
             </div>
