@@ -19,8 +19,23 @@ import {
   Users,
   X,
   Briefcase,
+  Images,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react'
+import inYourEyesCover from './assets/projects/inyoureyes.jpg'
+import claimCamCover from './assets/projects/claimcam.jpg'
 import './App.css'
+
+const projectPhotoModules = import.meta.glob<string>('./assets/projects/*/*.jpg', {
+  eager: true,
+  import: 'default',
+})
+const projectPhotos = (folder: string) =>
+  Object.entries(projectPhotoModules)
+    .filter(([path]) => path.includes(`/projects/${folder}/`))
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([, url]) => url)
 
 const profile = {
   name: 'Edoardo Rolfo',
@@ -139,18 +154,23 @@ const translations = {
     featuredProjectLabel: 'Vincitore XRCC 2025',
     featuredProjectTitle: 'InYourEyes',
     featuredProjectDescription: 'Ho guidato sviluppo e team end-to-end di un’app interattiva per simulare disabilità visive: dalla strategia di prodotto e roadmap al design delle interazioni e al prototipo pronto all’uso.',
+    featuredProjectDetails: 'Vincitrice di XR Creator Con 2025, InYourEyes è un’app per Meta Quest 3 che usa le tecnologie immersive per mostrare come le patologie della vista alterano la percezione, con l’obiettivo di informare e sensibilizzare. Ho costruito le interazioni insieme al UI designer, unendo competenze XR e UI/UX.',
     secondProjectLabel: 'Finalista XRCC 2026',
     secondProjectTitle: 'ClaimCam',
     secondProjectDescription: 'App XR per workflow assicurativi con ricostruzione 3D della scena tramite Gaussian Splatting, selezionata per XR Creator Con 2026.',
+    secondProjectDetails: 'Il progetto porta in XR il lavoro di periti e assicuratori: la scena di un sinistro viene ricostruita in 3D con il Gaussian Splatting, così da poterla esplorare e documentare anche a distanza.',
     thirdProjectLabel: '.NET MAUI / Blazor',
     thirdProjectTitle: 'BudgetBuddy',
     thirdProjectDescription: 'Web app per pianificare e tenere sotto controllo il budget mensile e annuale.',
+    thirdProjectDetails: 'Permette di registrare entrate e uscite, organizzarle per categoria e confrontare l’andamento mese per mese con gli obiettivi annuali.',
     fourthProjectLabel: 'XR / Unity',
     fourthProjectTitle: 'UI Centering',
     fourthProjectDescription: 'Piccolo esperimento XR con un’interfaccia che si ricentra automaticamente nel campo visivo dell’utente.',
+    fourthProjectDetails: 'Il pannello segue lo sguardo con un movimento morbido, restando sempre leggibile senza risultare invadente: una base riutilizzabile per interfacce XR più comode.',
     fifthProjectLabel: 'Esercitazione / C#',
     fifthProjectTitle: 'LeetCode',
     fifthProjectDescription: 'Raccolta delle mie soluzioni ai problemi di LeetCode, per allenare algoritmi e strutture dati. Tutte le soluzioni sono scritte da me, senza l’uso dell’AI.',
+    fifthProjectDetails: 'Un modo per tenermi allenato sulle basi: ogni soluzione è un esercizio di ragionamento, ottimizzazione e scrittura di codice pulito in C#.',
     projectRepoLinkLabel: 'Vedi su GitHub',
     previousProjects: 'Progetti precedenti',
     nextProjects: 'Progetti successivi',
@@ -180,6 +200,10 @@ const translations = {
     ],
     skillsCombinationTitle: 'Esempio concreto',
     skillsCombinationSource: 'Esempio tratto da',
+    projectGalleryOpen: 'Guarda le foto',
+    projectGalleryPrevious: 'Foto precedente',
+    projectGalleryNext: 'Foto successiva',
+    projectGalleryPhoto: 'Foto',
     skillsCombinationEmpty: 'Per questa coppia non c’è ancora un esempio da raccontare.',
     skillsItems: [
       { title: 'Cloud e infrastruttura', description: 'Terraform & AWS, Helm & Kubernetes.' },
@@ -381,18 +405,23 @@ const translations = {
     featuredProjectLabel: 'XRCC 2025 Award Winner',
     featuredProjectTitle: 'InYourEyes',
     featuredProjectDescription: 'Led the team and end-to-end development of an interactive visual impairment simulation app, from product strategy and feature roadmap to interaction design and a ready-to-use prototype.',
+    featuredProjectDetails: 'Winner of XR Creator Con 2025, InYourEyes is a Meta Quest 3 app that uses immersive technologies to show how vision pathologies alter perception, aiming to inform and raise awareness.',
     secondProjectLabel: 'XRCC 2026 Finalist',
     secondProjectTitle: 'ClaimCam',
     secondProjectDescription: 'An XR insurance workflow app using Gaussian Splatting for 3D scene reconstruction, selected for showcase at XR Creator Con 2026.',
+    secondProjectDetails: 'The project brings the work of loss adjusters and insurers into XR: the scene of a claim is reconstructed in 3D with Gaussian Splatting, so it can be explored and documented remotely.',
     thirdProjectLabel: '.NET MAUI / Blazor',
     thirdProjectTitle: 'BudgetBuddy',
     thirdProjectDescription: 'A web app to plan and keep track of monthly and annual budgets.',
+    thirdProjectDetails: 'It lets you record income and expenses, organize them by category, and compare month-by-month trends with annual goals.',
     fourthProjectLabel: 'XR / Unity',
     fourthProjectTitle: 'UI Centering',
     fourthProjectDescription: 'A small XR experiment with an interface that automatically re-centres itself in the user’s field of view.',
+    fourthProjectDetails: 'The panel follows the user’s gaze with smooth motion, staying readable without being intrusive: a reusable foundation for more comfortable XR interfaces.',
     fifthProjectLabel: 'Practice / C#',
     fifthProjectTitle: 'LeetCode',
     fifthProjectDescription: 'A collection of my solutions to LeetCode problems, used to practise algorithms and data structures. Every solution is written by me, without the use of AI.',
+    fifthProjectDetails: 'A way to keep my fundamentals sharp: each solution is an exercise in reasoning, optimization, and writing clean C# code.',
     projectRepoLinkLabel: 'View on GitHub',
     previousProjects: 'Previous projects',
     nextProjects: 'Next projects',
@@ -422,6 +451,10 @@ const translations = {
     ],
     skillsCombinationTitle: 'A real example',
     skillsCombinationSource: 'Example from',
+    projectGalleryOpen: 'View photos',
+    projectGalleryPrevious: 'Previous photo',
+    projectGalleryNext: 'Next photo',
+    projectGalleryPhoto: 'Photo',
     skillsCombinationEmpty: 'There is no example to share for this pairing yet.',
     skillsItems: [
       { title: 'Cloud & infrastructure', description: 'Terraform & AWS, Helm & Kubernetes.' },
@@ -665,6 +698,8 @@ function App() {
   const [aboutPageOpen, setAboutPageOpen] = useState(false)
   const [aboutRoleIndex, setAboutRoleIndex] = useState(0)
   const [selectedJourneyItem, setSelectedJourneyItem] = useState<JourneyItem | null>(null)
+  const [projectGallery, setProjectGallery] = useState<{ title: string; photos: string[]; index: number } | null>(null)
+  const projectGalleryDialog = useRef<HTMLDialogElement>(null)
   const resumeRequestDialog = useRef<HTMLDialogElement>(null)
   const journeyDialog = useRef<HTMLDialogElement>(null)
   const overviewPageHeading = useRef<HTMLHeadingElement>(null)
@@ -721,6 +756,21 @@ function App() {
     if (resumeRequestOpen && !dialog.open) dialog.showModal()
     if (!resumeRequestOpen && dialog.open) dialog.close()
   }, [resumeRequestOpen])
+
+  useEffect(() => {
+    const dialog = projectGalleryDialog.current
+    if (!dialog) return
+
+    if (projectGallery && !dialog.open) dialog.showModal()
+    if (!projectGallery && dialog.open) dialog.close()
+  }, [projectGallery])
+
+  const stepProjectGallery = (direction: number) => {
+    setProjectGallery((gallery) => gallery && {
+      ...gallery,
+      index: (gallery.index + direction + gallery.photos.length) % gallery.photos.length,
+    })
+  }
 
   useEffect(() => {
     const dialog = journeyDialog.current
@@ -944,7 +994,10 @@ function App() {
       label: copy.featuredProjectLabel,
       title: copy.featuredProjectTitle,
       description: copy.featuredProjectDescription,
+      details: copy.featuredProjectDetails,
       href: 'https://github.com/DE-R-V/in-your-eyes',
+      cover: inYourEyesCover,
+      photos: projectPhotos('inyoureyes'),
     },
     {
       number: '02',
@@ -952,7 +1005,10 @@ function App() {
       label: copy.secondProjectLabel,
       title: copy.secondProjectTitle,
       description: copy.secondProjectDescription,
+      details: copy.secondProjectDetails,
       href: 'https://github.com/finley-Sun/ClaimCam',
+      cover: claimCamCover,
+      photos: projectPhotos('claimcam'),
     },
     {
       number: '03',
@@ -960,6 +1016,7 @@ function App() {
       label: copy.thirdProjectLabel,
       title: copy.thirdProjectTitle,
       description: copy.thirdProjectDescription,
+      details: copy.thirdProjectDetails,
       href: 'https://github.com/DE-R-V/BudgetBuddy',
     },
     {
@@ -968,6 +1025,7 @@ function App() {
       label: copy.fourthProjectLabel,
       title: copy.fourthProjectTitle,
       description: copy.fourthProjectDescription,
+      details: copy.fourthProjectDetails,
       href: 'https://github.com/DE-R-V/ui-centering',
     },
     {
@@ -976,9 +1034,10 @@ function App() {
       label: copy.fifthProjectLabel,
       title: copy.fifthProjectTitle,
       description: copy.fifthProjectDescription,
+      details: copy.fifthProjectDetails,
       href: 'https://github.com/DE-R-V/LeetCode',
     },
-  ] as { number: string; style: string; label: string; title: string; description: string; href?: string }[]
+  ] as { number: string; style: string; label: string; title: string; description: string; details?: string; href?: string; cover?: string; photos?: string[] }[]
   const projectPageSize = 2
   const projectPageCount = Math.ceil(projectCards.length / projectPageSize)
   const visibleProjectCards = projectCards.slice(
@@ -1256,6 +1315,76 @@ function App() {
       </dialog>
 
       <dialog
+        className="project-gallery-dialog"
+        ref={projectGalleryDialog}
+        aria-labelledby="project-gallery-title"
+        onCancel={() => setProjectGallery(null)}
+        onClose={() => setProjectGallery(null)}
+        onClick={(event) => {
+          if (event.target === event.currentTarget) setProjectGallery(null)
+        }}
+        onKeyDown={(event) => {
+          if (event.key === 'ArrowLeft') stepProjectGallery(-1)
+          if (event.key === 'ArrowRight') stepProjectGallery(1)
+        }}
+      >
+        {projectGallery && (
+          <>
+            <div className="project-gallery-header">
+              <h2 id="project-gallery-title">{projectGallery.title}</h2>
+              <span className="project-gallery-counter">
+                {projectGallery.index + 1} / {projectGallery.photos.length}
+              </span>
+              <button
+                className="resume-request-close"
+                type="button"
+                aria-label={copy.closeDialogLabel}
+                onClick={() => setProjectGallery(null)}
+              >
+                <X size={20} aria-hidden="true" />
+              </button>
+            </div>
+            <div className="project-gallery-stage">
+              <button
+                className="project-gallery-arrow project-gallery-arrow--previous"
+                type="button"
+                aria-label={copy.projectGalleryPrevious}
+                onClick={() => stepProjectGallery(-1)}
+              >
+                <ChevronLeft size={24} aria-hidden="true" />
+              </button>
+              <img
+                key={projectGallery.photos[projectGallery.index]}
+                src={projectGallery.photos[projectGallery.index]}
+                alt={`${projectGallery.title}, ${copy.projectGalleryPhoto.toLowerCase()} ${projectGallery.index + 1}`}
+              />
+              <button
+                className="project-gallery-arrow project-gallery-arrow--next"
+                type="button"
+                aria-label={copy.projectGalleryNext}
+                onClick={() => stepProjectGallery(1)}
+              >
+                <ChevronRight size={24} aria-hidden="true" />
+              </button>
+            </div>
+            <div className="project-gallery-thumbs">
+              {projectGallery.photos.map((photo, index) => (
+                <button
+                  key={photo}
+                  type="button"
+                  aria-label={`${copy.projectGalleryPhoto} ${index + 1}`}
+                  aria-current={index === projectGallery.index}
+                  onClick={() => setProjectGallery({ ...projectGallery, index })}
+                >
+                  <img src={photo} alt="" loading="lazy" />
+                </button>
+              ))}
+            </div>
+          </>
+        )}
+      </dialog>
+
+      <dialog
         className="resume-request-dialog"
         ref={resumeRequestDialog}
         aria-labelledby="resume-request-title"
@@ -1332,17 +1461,34 @@ function App() {
                 className={`project-card project-card--${project.style} project-card--showcase-${index === 0 ? 'primary' : 'secondary'}`}
                 key={project.number}
               >
-                <div className={`project-art project-art--${project.style}`} aria-hidden="true">
-                  <span className="project-art-number">{project.number}</span>
-                  <div className="project-art-frame">
-                    <span className="project-art-rule" />
-                    <div className="project-art-lines">
-                      <span />
-                      <span />
-                      <span />
+                {project.cover ? (
+                  <div className={`project-art project-art--${project.style} project-art--cover`}>
+                    <img src={project.cover} alt="" loading="lazy" decoding="async" />
+                    {project.photos && project.photos.length > 0 && (
+                      <button
+                        className="project-gallery-trigger"
+                        type="button"
+                        onClick={() => setProjectGallery({ title: project.title, photos: project.photos ?? [], index: 0 })}
+                      >
+                        <Images size={17} strokeWidth={1.8} aria-hidden="true" />
+                        <span>{copy.projectGalleryOpen}</span>
+                        <span className="project-gallery-count">{project.photos.length}</span>
+                      </button>
+                    )}
+                  </div>
+                ) : (
+                  <div className={`project-art project-art--${project.style}`} aria-hidden="true">
+                    <span className="project-art-number">{project.number}</span>
+                    <div className="project-art-frame">
+                      <span className="project-art-rule" />
+                      <div className="project-art-lines">
+                        <span />
+                        <span />
+                        <span />
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
                 <div className="project-card-copy">
                   <div className="project-card-meta">
                     <p className="project-card-label">{project.label}</p>
@@ -1350,6 +1496,7 @@ function App() {
                   </div>
                   <h3>{project.title}</h3>
                   <p className="project-card-description">{project.description}</p>
+                  {project.details && <p className="project-card-details">{project.details}</p>}
                   {project.href && (
                     <a
                       className="project-card-link"
