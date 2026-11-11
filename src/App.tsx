@@ -74,7 +74,7 @@ const translations = {
     closeDialogLabel: 'Chiudi modulo',
     languageLabel: 'Seleziona lingua / Select language',
     scrollDesktop: 'Scorri per esplorare il sito',
-    scrollMobile: 'Scorri per visitare il sito',
+    scrollMobile: 'Scorri per conoscermi',
     mainNavigation: 'Navigazione principale',
     journeyNavigation: 'Percorso',
     projectsNavigation: 'Progetti',
@@ -97,7 +97,7 @@ const translations = {
     ],
     aboutImageAlt: 'Edoardo con un fungo raccolto durante una passeggiata',
     overviewAction: 'Torna alla panoramica',
-    journeyKicker: '01 / FORMAZIONE E LAVORO',
+    journeyKicker: 'FORMAZIONE E LAVORO',
     journeyTitle: 'Il mio percorso',
     journeyTimelineLabel: 'Timeline di formazione e lavoro',
     journeyCloseDetails: 'Chiudi i dettagli',
@@ -146,7 +146,7 @@ const translations = {
         description: 'Laurea triennale in Informatica conseguita all’Università di Torino.',
       },
     ],
-    projectsKicker: '02 / SELEZIONE',
+    projectsKicker: 'SELEZIONE',
     projectsTitle: 'Progetti personali',
     featuredProjectLabel: 'Vincitore XRCC 2025',
     featuredProjectTitle: 'InYourEyes',
@@ -172,11 +172,10 @@ const translations = {
     previousProjects: 'Progetti precedenti',
     nextProjects: 'Progetti successivi',
     projectPageLabel: 'Pagina progetti',
-    workProjectsNoteLabel: 'OLTRE I PROGETTI SELEZIONATI',
-    workProjectsNoteTitle: 'Esperienza professionale',
-    workProjectsNote: 'Per riservatezza non posso elencare qui i progetti lavorativi, ma sarò felice di parlarne di persona se ti interessa.',
+    workProjectsNoteLabel: 'Progetti lavorativi',
+    workProjectsNote: 'Non posso mostrare i progetti lavorativi, ma posso raccontarteli di persona.',
     workProjectsNoteAction: 'Parliamone',
-    skillsKicker: '03 / COMPETENZE',
+    skillsKicker: 'COMPETENZE',
     skillsTitle: 'Le mie competenze',
     skillsFusionTitle: 'Come contribuiscono le competenze',
     skillsFusionDescription: 'Scegli una competenza per ciascuna area e osserva nell’esempio come si combinano.',
@@ -295,7 +294,7 @@ const translations = {
         description: 'Ho modificato di mia iniziativa le pipeline delle merge request per evitare deploy inutili e ottenere solo piani Terraform reali, così da poter rivedere e riadattare il codice senza deploy rischiosi sugli ambienti condivisi.',
       },
     },
-    contactKicker: '04 / CONTATTI',
+    contactKicker: 'CONTATTI',
     contactTitle: 'Contatti',
     contactDescription: 'Per opportunità e collaborazioni, scrivimi:',
     contactEmailLabel: 'Scrivimi via email',
@@ -321,7 +320,7 @@ const translations = {
     closeDialogLabel: 'Close form',
     languageLabel: 'Select language / Seleziona lingua',
     scrollDesktop: 'Scroll to explore the website',
-    scrollMobile: 'Scroll to visit the website',
+    scrollMobile: 'Scroll down to know about me',
     mainNavigation: 'Main navigation',
     journeyNavigation: 'Journey',
     projectsNavigation: 'Projects',
@@ -344,7 +343,7 @@ const translations = {
     ],
     aboutImageAlt: 'Edoardo with a mushroom he found while out walking',
     overviewAction: 'Back to overview',
-    journeyKicker: '01 / EDUCATION & WORK',
+    journeyKicker: 'EDUCATION & WORK',
     journeyTitle: 'My journey',
     journeyTimelineLabel: 'Education and work timeline',
     journeyCloseDetails: 'Close details',
@@ -393,7 +392,7 @@ const translations = {
         description: 'Bachelor’s degree in Computer Science from the University of Turin.',
       },
     ],
-    projectsKicker: '02 / SELECTED WORK',
+    projectsKicker: 'SELECTED WORK',
     projectsTitle: 'Personal Projects',
     featuredProjectLabel: 'XRCC 2025 Award Winner',
     featuredProjectTitle: 'InYourEyes',
@@ -419,11 +418,10 @@ const translations = {
     previousProjects: 'Previous projects',
     nextProjects: 'Next projects',
     projectPageLabel: 'Projects page',
-    workProjectsNoteLabel: 'BEYOND THE SELECTED PROJECTS',
-    workProjectsNoteTitle: 'Professional experience',
-    workProjectsNote: 'I can’t list my work projects here for confidentiality reasons, but I’d be happy to discuss them in person.',
+    workProjectsNoteLabel: 'Professional projects',
+    workProjectsNote: 'I can’t show my work projects here, but I’m happy to talk about them in person.',
     workProjectsNoteAction: 'Let’s talk',
-    skillsKicker: '03 / SKILLS',
+    skillsKicker: 'SKILLS',
     skillsTitle: 'Skills',
     skillsFusionTitle: 'How the skills contribute',
     skillsFusionDescription: 'Choose one skill from each area to see how they work together in the example.',
@@ -542,7 +540,7 @@ const translations = {
         description: 'On my own initiative, I changed the merge request pipelines to avoid unnecessary deployments and produce only real Terraform plans, so code could be reviewed and reworked without risky deploys on shared environments.',
       },
     },
-    contactKicker: '04 / CONTACT',
+    contactKicker: 'CONTACT',
     contactTitle: 'Contact',
     contactDescription: 'For opportunities and collaborations, get in touch:',
     contactEmailLabel: 'Email me',
@@ -668,7 +666,7 @@ function ProfileSocials({
 function App() {
   const [progress, setProgress] = useState(0)
   const [projectPage, setProjectPage] = useState(0)
-  const [skillsView, setSkillsView] = useState<'inventory' | 'fusion'>('inventory')
+  const [skillsView, setSkillsView] = useState<'inventory' | 'fusion'>('fusion')
   const [selectedSkillIndices, setSelectedSkillIndices] = useState([2, 0])
   const [skillWheelRotations, setSkillWheelRotations] = useState([-180, 0])
   const [draggingSkillWheel, setDraggingSkillWheel] = useState<number | null>(null)
@@ -1537,15 +1535,8 @@ function App() {
               </button>
             </nav>
           )}
-          <aside className="projects-work-note" aria-labelledby="projects-work-note-title">
-            <span className="projects-work-note-icon" aria-hidden="true">
-              <MessageCircle size={22} strokeWidth={1.7} />
-            </span>
-            <div className="projects-work-note-copy">
-              <p>{copy.workProjectsNoteLabel}</p>
-              <h3 id="projects-work-note-title">{copy.workProjectsNoteTitle}</h3>
-              <p>{copy.workProjectsNote}</p>
-            </div>
+          <aside className="projects-work-note" aria-label={copy.workProjectsNoteLabel}>
+            <p className="projects-work-note-copy">{copy.workProjectsNote}</p>
             <a className="projects-work-note-link" href="#contatti">
               {copy.workProjectsNoteAction}
               <ArrowRight size={17} strokeWidth={1.8} aria-hidden="true" />
