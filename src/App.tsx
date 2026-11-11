@@ -9,7 +9,6 @@ import {
   Cloud,
   Eye,
   GitBranch,
-  ImagePlus,
   List,
   MessageCircle,
   Puzzle,
@@ -25,6 +24,8 @@ import {
 } from 'lucide-react'
 import inYourEyesCover from './assets/projects/inyoureyes.jpg'
 import claimCamCover from './assets/projects/claimcam.jpg'
+import portraitPhoto from './assets/Foto.jpg'
+import mushroomPhoto from './assets/Fungo.jpeg'
 import './App.css'
 
 const projectPhotoModules = import.meta.glob<string>('./assets/projects/*/*.jpg', {
@@ -82,9 +83,7 @@ const translations = {
     skillsViewsLabel: 'Visualizzazione competenze',
     skillsListView: 'Lista',
     skillsFusionView: 'Come?',
-    portraitAlt: 'Spazio per una foto personale',
-    portraitCaption: 'La tua foto',
-    portraitIndex: 'RITRATTO / 01',
+    portraitAlt: 'Ritratto di Edoardo Rolfo',
     aboutKicker: 'CHI SONO',
     aboutRolePrefix: 'Sono il tuo futuro',
     aboutRoles: ['collega', 'amico', 'software developer'],
@@ -96,9 +95,7 @@ const translations = {
       'Sono socievole, collaborativo e determinato: mi piace condividere ciò che imparo, lavorare insieme e curare i dettagli. Cerco progetti che abbiano un impatto concreto sulle persone; per me contano più il valore di ciò che si costruisce e il gruppo di lavoro del settore o dello stack.',
       'Fuori dal lavoro mi trovi tra videogiochi, storytelling e worldbuilding, extended reality e raccolta funghi. Parlo italiano, sono a livello C1 in inglese e sto imparando lo svedese (A1).',
     ],
-    aboutImageAlt: 'Spazio per una seconda immagine personale',
-    aboutImageCaption: 'Seconda immagine da scegliere',
-    aboutImageIndex: 'RITRATTO / 02',
+    aboutImageAlt: 'Edoardo con un fungo raccolto durante una passeggiata',
     overviewAction: 'Torna alla panoramica',
     journeyKicker: '01 / FORMAZIONE E LAVORO',
     journeyTitle: 'Il mio percorso',
@@ -333,9 +330,7 @@ const translations = {
     skillsViewsLabel: 'Skills view',
     skillsListView: 'List',
     skillsFusionView: 'How?',
-    portraitAlt: 'Space for a personal portrait',
-    portraitCaption: 'Your photo',
-    portraitIndex: 'PORTRAIT / 01',
+    portraitAlt: 'Portrait of Edoardo Rolfo',
     aboutKicker: 'ABOUT',
     aboutRolePrefix: 'I could be your future',
     aboutRoles: ['colleague', 'friend', 'software developer'],
@@ -347,9 +342,7 @@ const translations = {
       'I’m sociable, collaborative, and determined. I enjoy sharing what I learn, working as a team, and taking care of the details. I’m looking for projects with a tangible impact on people; the value of the work and the people I build it with matter more to me than the sector or tech stack.',
       'Outside work, you’ll find me playing video games, exploring storytelling and worldbuilding, getting into extended reality, or out mushroom foraging. I’m a native Italian speaker, have C1 English, and I’m learning Swedish (A1).',
     ],
-    aboutImageAlt: 'Space for a second personal image',
-    aboutImageCaption: 'Second image to be chosen',
-    aboutImageIndex: 'PORTRAIT / 02',
+    aboutImageAlt: 'Edoardo with a mushroom he found while out walking',
     overviewAction: 'Back to overview',
     journeyKicker: '01 / EDUCATION & WORK',
     journeyTitle: 'My journey',
@@ -813,7 +806,7 @@ function App() {
 
     const interval = window.setInterval(() => {
       setAboutRoleIndex((index) => (index + 1) % copy.aboutRoles.length)
-    }, 2400)
+    }, 3600)
 
     return () => window.clearInterval(interval)
   }, [copy.aboutRoles.length])
@@ -1141,10 +1134,8 @@ function App() {
                 aria-hidden={aboutPageOpen}
                 inert={aboutPageOpen}
               >
-                <div className="portrait-placeholder" role="img" aria-label={copy.portraitAlt}>
-                  <ImagePlus size={32} strokeWidth={1.5} aria-hidden="true" />
-                  <span className="portrait-caption">{copy.portraitCaption}</span>
-                  <span className="portrait-index">{copy.portraitIndex}</span>
+                <div className="portrait-placeholder">
+                  <img className="portrait-photo" src={portraitPhoto} alt={copy.portraitAlt} />
                 </div>
 
                 <div className="home-copy">
@@ -1192,14 +1183,8 @@ function App() {
                 aria-hidden={!aboutPageOpen}
                 inert={!aboutPageOpen}
               >
-                <div
-                  className="portrait-placeholder portrait-placeholder--about"
-                  role="img"
-                  aria-label={copy.aboutImageAlt}
-                >
-                  <ImagePlus size={32} strokeWidth={1.5} aria-hidden="true" />
-                  <span className="portrait-caption">{copy.aboutImageCaption}</span>
-                  <span className="portrait-index">{copy.aboutImageIndex}</span>
+                <div className="portrait-placeholder portrait-placeholder--about">
+                  <img className="portrait-photo" src={mushroomPhoto} alt={copy.aboutImageAlt} />
                 </div>
 
                 <div className="about-page-copy">
