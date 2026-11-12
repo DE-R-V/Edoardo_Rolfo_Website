@@ -45,6 +45,9 @@ const profile = {
 }
 
 const resumeRequestRecipient = 'edoardo.rolfo.er@gmail.com'
+const resumeRequestEmailSubject = 'Richiesta CV dal sito'
+type RegionsByCountry = Record<string, string[]>
+const web3FormsAccessKey = import.meta.env.VITE_WEB3FORMS_ACCESS_KEY as string | undefined
 
 const socialProfiles = [
   { name: 'LinkedIn', url: profile.linkedinUrl, icon: faLinkedin },
@@ -61,15 +64,20 @@ const translations = {
     profilesLabel: 'Profili personali',
     resumeLabel: 'Curriculum',
     resumeRequestTitle: 'Richiedi il curriculum',
-    resumeRequestDescription: 'Compila i dati e prepara una richiesta da inviare via email.',
+    resumeRequestDescription: 'Compila i dati: riceverò la richiesta e ti invierò il CV via email.',
     firstNameLabel: 'Nome',
     lastNameLabel: 'Cognome',
     companyLabel: 'Azienda',
-    companyLocationLabel: 'Località dell’azienda',
+    countryLabel: 'Nazione',
+    regionLabel: 'Regione / Stato',
+    cityLabel: 'Città',
+    selectPlaceholder: 'Seleziona…',
     positionLabel: 'Posizione offerta o d’interesse',
     recruiterEmailLabel: 'Email del recruiter a cui inviare il CV',
-    emailSubject: 'Richiesta curriculum',
-    openEmailAction: 'Apri email precompilata',
+    openEmailAction: 'Invia richiesta',
+    sendingAction: 'Invio in corso…',
+    requestSentMessage: 'Richiesta inviata! Ti risponderò al più presto.',
+    requestErrorMessage: 'Invio non riuscito. Riprova o scrivimi direttamente via email.',
     cancelAction: 'Annulla',
     closeDialogLabel: 'Chiudi modulo',
     languageLabel: 'Seleziona lingua / Select language',
@@ -307,15 +315,20 @@ const translations = {
     profilesLabel: 'Social profiles',
     resumeLabel: 'Resume',
     resumeRequestTitle: 'Request the CV',
-    resumeRequestDescription: 'Fill in the details to prepare an email request.',
+    resumeRequestDescription: 'Fill in the details: I will receive your request and send you the CV by email.',
     firstNameLabel: 'First name',
     lastNameLabel: 'Last name',
     companyLabel: 'Company',
-    companyLocationLabel: 'Company location',
+    countryLabel: 'Country',
+    regionLabel: 'Region / State',
+    cityLabel: 'City',
+    selectPlaceholder: 'Select…',
     positionLabel: 'Position offered or of interest',
     recruiterEmailLabel: 'Recruiter email to send the CV to',
-    emailSubject: 'CV request',
-    openEmailAction: 'Open prefilled email',
+    openEmailAction: 'Send request',
+    sendingAction: 'Sending…',
+    requestSentMessage: 'Request sent! I will get back to you soon.',
+    requestErrorMessage: 'Sending failed. Please try again or email me directly.',
     cancelAction: 'Cancel',
     closeDialogLabel: 'Close form',
     languageLabel: 'Select language / Seleziona lingua',
@@ -686,6 +699,9 @@ function App() {
     window.localStorage.getItem('portfolio-language') === 'en' ? 'en' : 'it'
   ))
   const [resumeRequestOpen, setResumeRequestOpen] = useState(false)
+  const [regionsByCountry, setRegionsByCountry] = useState<RegionsByCountry | null>(null)
+  const [selectedCountry, setSelectedCountry] = useState('IT')
+  const [resumeRequestStatus, setResumeRequestStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
   const [aboutPageOpen, setAboutPageOpen] = useState(false)
   const [aboutRoleIndex, setAboutRoleIndex] = useState(0)
   const [selectedJourneyItem, setSelectedJourneyItem] = useState<JourneyItem | null>(null)
@@ -836,29 +852,71 @@ function App() {
     previousAboutPageOpen.current = aboutPageOpen
   }, [aboutPageOpen])
 
-  const handleResumeRequest = (event: FormEvent<HTMLFormElement>) => {
+  useEffect(() => {
+    if (!resumeRequestOpen || regionsByCountry) return
+    void import('./data/regions.json').then((module) => setRegionsByCountry(module.default as RegionsByCountry))
+  }, [regionsByCountry, resumeRequestOpen])
+
+  const countryNames = new Intl.DisplayNames([language], { type: 'region' })
+  const countryOptions = Object.keys(regionsByCountry ?? { IT: [] })
+    .map((code) => ({ code, name: countryNames.of(code) ?? code }))
+    .sort((a, b) => a.name.localeCompare(b.name, language))
+  const regionOptions = regionsByCountry?.[selectedCountry] ?? []
+
+  const handleResumeRequest = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    const formData = new FormData(event.currentTarget)
+    const form = event.currentTarget
+    const formData = new FormData(form)
+    if (formData.get('botcheck')) return
     const values = {
       firstName: String(formData.get('firstName')),
       lastName: String(formData.get('lastName')),
       company: String(formData.get('company')),
-      location: String(formData.get('location')),
+      country: new Intl.DisplayNames(['it'], { type: 'region' }).of(String(formData.get('country'))) ?? '',
+      region: String(formData.get('region') ?? ''),
+      city: String(formData.get('city') ?? ''),
       position: String(formData.get('position')),
       recruiterEmail: String(formData.get('recruiterEmail')),
     }
-    const subject = `${copy.emailSubject} - ${values.company}`
+    const subject = resumeRequestEmailSubject
+    const location = [values.city, values.region, values.country].filter(Boolean).join(', ')
     const body = [
-      `${copy.firstNameLabel}: ${values.firstName}`,
-      `${copy.lastNameLabel}: ${values.lastName}`,
-      `${copy.companyLabel}: ${values.company}`,
-      `${copy.companyLocationLabel}: ${values.location}`,
-      `${copy.positionLabel}: ${values.position}`,
-      `${copy.recruiterEmailLabel}: ${values.recruiterEmail}`,
+      'Nuova richiesta CV dal sito.',
+      '',
+      `Nome: ${[values.firstName, values.lastName].filter(Boolean).join(' ')}`,
+      `Email recruiter: ${values.recruiterEmail}`,
+      `Azienda: ${values.company}`,
+      `Sede: ${location}`,
+      `Posizione: ${values.position}`,
+      `Lingua del sito: ${language.toUpperCase()}`,
     ].join('\n')
 
-    window.location.href = `mailto:${resumeRequestRecipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
-    setResumeRequestOpen(false)
+    if (!web3FormsAccessKey) {
+      window.location.href = `mailto:${resumeRequestRecipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+      setResumeRequestOpen(false)
+      return
+    }
+
+    setResumeRequestStatus('sending')
+    try {
+      const response = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({
+          access_key: web3FormsAccessKey,
+          subject,
+          from_name: `${values.firstName} ${values.lastName}`,
+          replyto: values.recruiterEmail,
+          message: body,
+        }),
+      })
+      const result = await response.json() as { success?: boolean }
+      if (!response.ok || !result.success) throw new Error('Web3Forms request failed')
+      form.reset()
+      setResumeRequestStatus('sent')
+    } catch {
+      setResumeRequestStatus('error')
+    }
   }
 
   const setSelectedSkillIndex = (groupIndex: number, index: number) => {
@@ -1081,7 +1139,7 @@ function App() {
               linkClassName="mobile-social-link"
               profilesLabel={copy.profilesLabel}
               resumeLabel={copy.resumeLabel}
-              onResumeClick={() => setResumeRequestOpen(true)}
+              onResumeClick={() => { setResumeRequestStatus('idle'); setResumeRequestOpen(true) }}
             />
             <div className="scroll-invitation">
               <ArrowDown size={20} strokeWidth={1.8} aria-hidden="true" />
@@ -1112,7 +1170,7 @@ function App() {
                 linkClassName="home-social-link"
                 profilesLabel={copy.profilesLabel}
                 resumeLabel={copy.resumeLabel}
-                onResumeClick={() => setResumeRequestOpen(true)}
+                onResumeClick={() => { setResumeRequestStatus('idle'); setResumeRequestOpen(true) }}
                 withTooltips
               />
               {curtainProgress >= 0.85 && (
@@ -1389,30 +1447,63 @@ function App() {
           </button>
         </div>
         <form className="resume-request-form" onSubmit={handleResumeRequest}>
+          <input className="resume-request-honeypot" type="checkbox" name="botcheck" tabIndex={-1} autoComplete="off" aria-hidden="true" />
           <label>
-            <span>{copy.firstNameLabel}</span>
+            <span>{copy.firstNameLabel} <span className="resume-request-required" aria-hidden="true">*</span></span>
             <input autoComplete="given-name" name="firstName" required />
           </label>
           <label>
             <span>{copy.lastNameLabel}</span>
-            <input autoComplete="family-name" name="lastName" required />
+            <input autoComplete="family-name" name="lastName" />
           </label>
           <label>
-            <span>{copy.companyLabel}</span>
+            <span>{copy.companyLabel} <span className="resume-request-required" aria-hidden="true">*</span></span>
             <input autoComplete="organization" name="company" required />
           </label>
           <label>
-            <span>{copy.companyLocationLabel}</span>
-            <input name="location" required />
+            <span>{copy.countryLabel} <span className="resume-request-required" aria-hidden="true">*</span></span>
+            <select
+              name="country"
+              required
+              value={selectedCountry}
+              onChange={(event) => setSelectedCountry(event.target.value)}
+            >
+              {countryOptions.map(({ code, name }) => (
+                <option key={code} value={code}>{name}</option>
+              ))}
+            </select>
+          </label>
+          {regionOptions.length > 0 ? (
+            <label>
+              <span>{copy.regionLabel}</span>
+              <select key={selectedCountry} name="region" defaultValue="">
+                <option value="">{copy.selectPlaceholder}</option>
+                {regionOptions.map((region) => (
+                  <option key={region} value={region}>{region}</option>
+                ))}
+              </select>
+            </label>
+          ) : null}
+          <label className={regionOptions.length > 0 ? undefined : 'resume-request-field--wide'}>
+            <span>{copy.cityLabel}</span>
+            <input autoComplete="address-level2" name="city" />
           </label>
           <label className="resume-request-field--wide">
-            <span>{copy.positionLabel}</span>
+            <span>{copy.positionLabel} <span className="resume-request-required" aria-hidden="true">*</span></span>
             <input name="position" required />
           </label>
           <label className="resume-request-field--wide">
-            <span>{copy.recruiterEmailLabel}</span>
+            <span>{copy.recruiterEmailLabel} <span className="resume-request-required" aria-hidden="true">*</span></span>
             <input autoComplete="email" name="recruiterEmail" type="email" required />
           </label>
+          {resumeRequestStatus === 'sent' || resumeRequestStatus === 'error' ? (
+            <p
+              className={`resume-request-status resume-request-status--${resumeRequestStatus} resume-request-field--wide`}
+              role="status"
+            >
+              {resumeRequestStatus === 'sent' ? copy.requestSentMessage : copy.requestErrorMessage}
+            </p>
+          ) : null}
           <div className="resume-request-actions resume-request-field--wide">
             <button
               className="resume-request-cancel"
@@ -1421,8 +1512,8 @@ function App() {
             >
               {copy.cancelAction}
             </button>
-            <button className="resume-request-submit" type="submit">
-              {copy.openEmailAction}
+            <button className="resume-request-submit" type="submit" disabled={resumeRequestStatus === 'sending'}>
+              {resumeRequestStatus === 'sending' ? copy.sendingAction : copy.openEmailAction}
               <ArrowRight size={16} aria-hidden="true" />
             </button>
           </div>
@@ -1829,7 +1920,7 @@ function App() {
                 linkClassName="contact-social-link"
                 profilesLabel={copy.profilesLabel}
                 resumeLabel={copy.resumeLabel}
-                onResumeClick={() => setResumeRequestOpen(true)}
+                onResumeClick={() => { setResumeRequestStatus('idle'); setResumeRequestOpen(true) }}
                 withLabels
               />
             </div>

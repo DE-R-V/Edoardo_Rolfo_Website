@@ -589,7 +589,8 @@ summary:active {
   font-weight: 600;
 }
 
-.resume-request-form input {
+.resume-request-form input,
+.resume-request-form select {
   width: 100%;
   min-width: 0;
   height: 44px;
@@ -602,10 +603,26 @@ summary:active {
   font-size: 14px;
 }
 
-.resume-request-form input:focus-visible {
+.resume-request-form input:focus-visible,
+.resume-request-form select:focus-visible {
   border-color: #6d6f72;
   outline: 2px solid rgba(109, 111, 114, 0.28);
   outline-offset: 1px;
+}
+
+.resume-request-form select {
+  appearance: none;
+  padding-right: 40px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2325272a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+.resume-request-required {
+  color: #a3262a;
 }
 
 .resume-request-field--wide {
@@ -650,6 +667,31 @@ summary:active {
 
 .resume-request-submit:hover {
   background: var(--accent-gold-dark);
+}
+
+.resume-request-submit:disabled {
+  cursor: progress;
+  opacity: 0.7;
+}
+
+.resume-request-honeypot {
+  display: none;
+}
+
+.resume-request-status {
+  margin: 0;
+  padding: 10px 12px;
+  font-size: 14px;
+}
+
+.resume-request-status--sent {
+  color: #1f5130;
+  background: rgba(46, 125, 50, 0.12);
+}
+
+.resume-request-status--error {
+  color: #7a1f1f;
+  background: rgba(198, 40, 40, 0.1);
 }
 
 .resume-request-close:focus-visible,
