@@ -1045,6 +1045,8 @@ function App() {
       description: copy.featuredProjectDescription,
       details: copy.featuredProjectDetails,
       href: 'https://github.com/DE-R-V/in-your-eyes',
+      tech: ['Unity', 'C#', 'Meta XR SDK', 'Quest 3'],
+      accent: 'gold',
       cover: inYourEyesCover,
       photos: projectPhotos('inyoureyes'),
     },
@@ -1056,6 +1058,8 @@ function App() {
       description: copy.secondProjectDescription,
       details: copy.secondProjectDetails,
       href: 'https://github.com/finley-Sun/ClaimCam',
+      tech: ['Unity', 'C#', 'Meta IWSDK', 'Web', 'Gaussian Splatting'],
+      accent: 'blue',
       cover: claimCamCover,
       photos: projectPhotos('claimcam'),
     },
@@ -1067,6 +1071,8 @@ function App() {
       description: copy.thirdProjectDescription,
       details: copy.thirdProjectDetails,
       href: 'https://github.com/DE-R-V/BudgetBuddy',
+      tech: ['.NET MAUI', 'Blazor', 'C#'],
+      accent: 'sky',
     },
     {
       number: '04',
@@ -1076,6 +1082,8 @@ function App() {
       description: copy.fourthProjectDescription,
       details: copy.fourthProjectDetails,
       href: 'https://github.com/DE-R-V/ui-centering',
+      tech: ['Unity', 'C#', 'XR Interaction Toolkit'],
+      accent: 'gold',
     },
     {
       number: '05',
@@ -1085,8 +1093,10 @@ function App() {
       description: copy.fifthProjectDescription,
       details: copy.fifthProjectDetails,
       href: 'https://github.com/DE-R-V/LeetCode',
+      tech: ['C#', '.NET', 'DSA'],
+      accent: 'blue',
     },
-  ] as { number: string; style: string; label: string; title: string; description: string; details?: string; href?: string; cover?: string; photos?: string[] }[]
+  ] as { number: string; style: string; label: string; title: string; description: string; details?: string; href?: string; cover?: string; photos?: string[]; tech: string[]; accent: 'gold' | 'blue' | 'sky' }[]
   const projectPageSize = 2
   const projectPageCount = Math.ceil(projectCards.length / projectPageSize)
   const visibleProjectCards = projectCards.slice(
@@ -1532,7 +1542,7 @@ function App() {
           >
             {visibleProjectCards.map((project, index) => (
               <article
-                className={`project-card project-card--${project.style} project-card--showcase-${index === 0 ? 'primary' : 'secondary'}`}
+                className={`project-card project-card--${project.style} project-card--showcase-${index === 0 ? 'primary' : 'secondary'} project-card--accent-${project.accent}`}
                 key={project.number}
               >
                 {project.cover ? (
@@ -1571,6 +1581,11 @@ function App() {
                   <h3>{project.title}</h3>
                   <p className="project-card-description">{project.description}</p>
                   {project.details && <p className="project-card-details">{project.details}</p>}
+                  <ul className="project-card-tech" aria-label="Tech stack">
+                    {project.tech.map((tech) => (
+                      <li key={tech}>{tech}</li>
+                    ))}
+                  </ul>
                   {project.href && (
                     <a
                       className="project-card-link"
